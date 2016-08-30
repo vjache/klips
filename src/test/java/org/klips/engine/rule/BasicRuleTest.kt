@@ -10,7 +10,7 @@ class BasicRuleTest : RuleTestCommon() {
     @Test
     fun rule_Actor_At_Land() {
         testTriggered(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")),
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),
                 Land(ref("cid"), ref("land")),
                 At(ref("aid"), ref("cid")))
         {
@@ -24,7 +24,7 @@ class BasicRuleTest : RuleTestCommon() {
     @Test
     fun rule_Actor_At_Resource() {
         testTriggered(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")),
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),
                 At(ref("aid"), ref("cid")),
                 Resource(ref("cid"), ref("type"), ref("amount")))
         {
@@ -38,9 +38,9 @@ class BasicRuleTest : RuleTestCommon() {
     @Test
     fun rule_Adjacent_Actor() {
         testTriggered(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")),
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),
                 At(ref("aid"), ref("cid")),
-                Actor(ref("aid1"), ref("pid1"), ref("kind1"), ref("nrgy1")),
+                Actor(ref("aid1"), ref("pid1"), ref("kind1"), ref("nrgy1"), ref("hlth1"), ref("state1")),
                 At(ref("aid1"), ref("cid1")),
                 Adjacent(ref("cid"), ref("cid1")))
         {

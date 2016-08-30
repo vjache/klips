@@ -14,7 +14,7 @@ class RuleDslTest {
         r.input.flush {
             assert(Adjacent(0, 1),
                     At(100, 1),
-                    Actor(100, 1000, ActorKind.Aim, 7f),
+                    Actor(100, 1000, ActorKind.Aim, 7f, 100f, State.OnMarch),
                     ActorSelected(100))
         }.blink(TapCell(0))
 

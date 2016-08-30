@@ -39,7 +39,7 @@ class Rename : Tree {
 
     override fun clone() = Rename(reteNode, signature, tree)
 
-    override fun bind(t: Tree): Binding? {
+    override fun bind_(t: Tree): Binding? {
         if (t !is Rename)
             return null
 

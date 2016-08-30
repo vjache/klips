@@ -58,7 +58,7 @@ class JoinBindingSetTest {
     @Test
     fun testFactBindingSet_Actor() {
         val fbs = FactBindingSet(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")),
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),
                 world.facts)
 
         assertEquals(fbs.toSet().size, fbs.size)
@@ -73,7 +73,7 @@ class JoinBindingSetTest {
                 Actor(ref("aid"),
                         pid,
                         ref("kind"),
-                        ref("nrgy")),
+                        ref("nrgy"), ref("hlth"), ref("state")),
                 world.facts)
 
         assertEquals(fbs.toSet().size, fbs.size)
@@ -122,7 +122,7 @@ class JoinBindingSetTest {
                 Actor(ref("aid"),
                       ref("pid"),
                       ref("kind"),
-                      ref("nrgy")),
+                      ref("nrgy"), ref("hlth"), ref("state")),
                 world.facts)
 
         val bsJoin      = JoinBindingSet(bsPlayers, bsActors)
@@ -146,7 +146,7 @@ class JoinBindingSetTest {
     fun testJoin_ActorsAndLands() {
 
         val bsActors = FactBindingSet(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")),
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),
                 world.facts)
 
         val bsLands = FactBindingSet(
@@ -170,7 +170,7 @@ class JoinBindingSetTest {
 
         val actorKind = FacetRef<ActorKind>("kind")
         val bsActors = FactBindingSet(
-                Actor(ref("aid"), ref("pid"), actorKind, ref("nrgy")),
+                Actor(ref("aid"), ref("pid"), actorKind, ref("nrgy"), ref("hlth"), ref("state")),
                 world.facts)
 
         val bsAts = FactBindingSet(
@@ -191,7 +191,7 @@ class JoinBindingSetTest {
         val bsCommActors = FactBindingSet(
                 Actor(  ref("aid"), ref("pid"),
                         ConstFacet(ActorKind.Comm),
-                        ref("nrgy")),
+                        ref("nrgy"), ref("hlth"), ref("state")),
                 world.facts)
 
         val bsJoin2 = JoinBindingSet(
@@ -212,14 +212,14 @@ class JoinBindingSetTest {
 
         val set = mutableSetOf<Fact>().apply {
             for(i in 1..3) add(Player(ref("pid-$i"), ref("color-$i")))
-            for(i in 1..3) add(Actor(ref("aid-$i"), ref("pid-$i"), ref("kind-$i"), ref("nrgy-$i")))
+            for(i in 1..3) add(Actor(ref("aid-$i"), ref("pid-$i"), ref("kind-$i"), ref("nrgy-$i"), ref("hlth-$i"), ref("state-$i")))
         }
 
         val bsPlayers = FactBindingSet(
                 Player(ref("pid"), ref("color")), set)
 
         val bsActors = FactBindingSet(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")), set)
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")), set)
 
         val bsJoin = JoinBindingSet(bsPlayers, bsActors)
 

@@ -14,25 +14,25 @@ class ReteTestGraphBuilder {
 
     val pattern1 = mutableSetOf<Fact>().apply {
         add(Player(ref("pid"), ref("color")))
-        add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")))
+        add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")))
     }
 
     val pattern2 = mutableSetOf<Fact>().apply {
-        add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")) )
+        add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")) )
         add(Land(ref("cid"), ref("land")))
         add(At(ref("aid"), ref("cid")))
     }
 
     val pattern3 = mutableSetOf<Fact>().apply {
-        add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")))
+        add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")))
         add(At(ref("aid"), ref("cid")))
         add(Resource(ref("cid"), ref("type"), ref("amount")))
     }
 
     val pattern4 = mutableSetOf<Fact>().apply {
-        add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")))
+        add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")))
         add(At(ref("aid"), ref("cid")))
-        add(Actor(ref("aid1"), ref("pid1"), ref("kind1"), ref("nrgy1")))
+        add(Actor(ref("aid1"), ref("pid1"), ref("kind1"), ref("nrgy1"), ref("hlth1"), ref("state1")))
         add(At(ref("aid1"), ref("cid1")))
         add(Adjacent(ref("cid"), ref("cid1")))
     }

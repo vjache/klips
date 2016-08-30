@@ -1,13 +1,14 @@
 package org.klips.engine.query
 
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import org.klips.dsl.Facet
 import org.klips.dsl.Facet.FacetRef
 import org.klips.dsl.Facet.IntFacet
 import org.klips.dsl.Fact
 import org.klips.engine.PatternMatcher
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
 
 
 class FactBindingSetTest {
@@ -27,50 +28,27 @@ class FactBindingSetTest {
     }
 
     @Test
-    fun basicMatcher(){
-        val facts1 = arrayOf(
-                Adjacent(0, 1),
-                Adjacent(0, 2),
-                Adjacent(1, 1)
-                )
-        val patt1 = PatternMatcher(Adjacent(IntFacet(0), FacetRef<Int>("aid1")))
-
-        facts1.forEach { println(patt1.bind(it)) }
-    }
-
-    @Test
-    fun sameMatcher(){
-        val facts1 = arrayOf(
-                Adjacent(0, 1),
-                Adjacent(0, 2),
-                Adjacent(1, 1),
-                Adjacent(FacetRef<Int>("id1"), FacetRef<Int>("id1")),
-                Adjacent(FacetRef<Int>("id1"), FacetRef<Int>("id2"))
-        )
-        val patt1 = PatternMatcher(Adjacent(FacetRef<Int>("aid1"), FacetRef<Int>("aid1")))
-
-        facts1.forEach { println(patt1.bind(it)) }
-
-        val patt2 = PatternMatcher(Adjacent(FacetRef<Int>("x"), FacetRef<Int>("y")))
-
-        facts1.forEach { println(patt2.bind(it)) }
-    }
-    @Test
     fun basicSubst(){
         val patt1 = Adjacent(FacetRef<Int>("x"), FacetRef<Int>("y"))
         val patt2 = Adjacent(FacetRef<Int>("aid2"), FacetRef<Int>("aid1"))
         val patt2c = patt2.substitute(FacetRef<Int>("aid2"), FacetRef<Int>("xxx2"))
 
+        assertEquals(Adjacent(ref("xxx2"), ref("aid1")), patt2c)
         println(patt2)
         println(patt2c)
 
         println("Before subst: $patt2")
         println("After subst: ${patt2.substitute(
                 PatternMatcher(patt2).bind(patt1)!!)}")
+
+        assertEquals(
+                patt1,
+                patt2.substitute(
+                        PatternMatcher(patt2).bind(patt1)!!))
     }
 
     @Test
-    fun basicMatch() {
+    fun onlyMatchingBindings() {
         val facts = listOf(
                 Adjacent(0, 1),
                 Adjacent(0, 2),
@@ -88,4 +66,6 @@ class FactBindingSetTest {
         assert(bs.size == 4)
         println(bs)
     }
+
+    fun <T : Comparable<T>> ref(id:String) = Facet.FacetRef<T>(id)
 }

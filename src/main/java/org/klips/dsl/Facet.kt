@@ -21,7 +21,7 @@ interface Facet<T> : Comparable<Facet<*>> {
             is ConstFacet<*> ->
                 value.javaClass == f.value.javaClass
                     && f.value as T == value
-            is FacetRef<*> -> true
+            is FacetRef<*> -> false
             else           -> false
         }
 

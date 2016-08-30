@@ -13,20 +13,20 @@ class FactTest {
     @Test
     fun patternEqualities(){
         assertEquals(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")),
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")))
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")))
 
         assertEquals(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")).hashCode(),
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")).hashCode())
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")).hashCode(),
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")).hashCode())
 
         assertNotEquals(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")),
-                Actor(ref("aid"), ref("pid"), ref("kind-1"), ref("nrgy")))
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),
+                Actor(ref("aid"), ref("pid"), ref("kind-1"), ref("nrgy"), ref("hlth"), ref("state")))
 
         assertNotEquals(
-                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy")).hashCode(),
-                Actor(ref("aid"), ref("pid"), ref("kind-1"), ref("nrgy")).hashCode())
+                Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")).hashCode(),
+                Actor(ref("aid"), ref("pid"), ref("kind-1"), ref("nrgy"), ref("hlth"), ref("state")).hashCode())
     }
 
     @Test

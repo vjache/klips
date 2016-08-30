@@ -57,7 +57,7 @@ class Fork : Tree {
         this.junctLeafsMap = junctLeafsMap
     }
 
-    override fun bind(t: Tree): Binding? {
+    override fun bind_(t: Tree): Binding? {
         if (t !is Fork)
             return null
 

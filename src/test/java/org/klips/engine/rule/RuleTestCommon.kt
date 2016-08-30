@@ -24,17 +24,22 @@ open class RuleTestCommon {
             )
 
     fun testTriggered(vararg pattern: Fact, mdfs : () -> Array<Modification<out Fact>>){
+        var triggeredCount = 0
         val rule = createRule(*pattern) { sol, effect ->
             println("Solution : $sol")
             val conditions = pattern.map {
                 sol.inherit(it.substitute(sol.arg))
             }
             println("Condition : $conditions")
+
+            triggeredCount ++
         }
 
         StrategyOneMem(rule).input.apply {
             modify(*mdfs())
-        }
+        }.flush()
+
+        assert(triggeredCount > 0)
     }
 
 }

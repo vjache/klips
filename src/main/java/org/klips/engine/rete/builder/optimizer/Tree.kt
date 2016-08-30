@@ -13,7 +13,14 @@ abstract class Tree : Cloneable {
     abstract val signature: Signature
     abstract val junctLeafsMap: Map<FacetRef<*>, Set<Leaf>>
     public abstract override fun clone(): Tree
-    abstract fun bind(t: Tree): Binding?
+    abstract fun bind_(t: Tree): Binding?
+    fun bind(t: Tree): Binding? {
+        return bind_(t)?.let { binding ->
+            if(!binding.all { it.key == it.value || (it.key is FacetRef && it.value is FacetRef)})
+                return null
+            else binding
+        }
+    }
 
     val junctLeafs: Set<Set<Leaf>> by lazy {
         junctLeafsMap.values.filter { it.size > 1 }.toSet()

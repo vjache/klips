@@ -1,11 +1,6 @@
 package org.klips.dsl
 
-import org.klips.dsl.RuleSet
-import org.klips.dsl.get
 import org.klips.engine.*
-import org.klips.engine.Modification.Assert
-import org.klips.engine.Modification.Retire
-import org.klips.dsl.ActivationFilter.Both
 
 class TapRules : RuleSet() {
 
@@ -22,6 +17,10 @@ class TapRules : RuleSet() {
     val pid1 = ref<PlayerId>("pid1")
     val nrgy = ref<Level>("nrgy")
     val nrgy1 = ref<Level>("nrgy1")
+    val hlth = ref<Level>("hlth")
+    val hlth1 = ref<Level>("hlth1")
+    val state = ref<State>("state")
+    val state1 = ref<State>("state1")
 
     init {
 
@@ -33,50 +32,55 @@ class TapRules : RuleSet() {
         }
 
         rule { // On Move
+
             TapCell(cid).retire()
             Adjacent(cid, cid1).assert()
             At(aid, cid1).assert()
-            Actor(aid, pid, kind, nrgy).retire()
+            Actor(aid, pid, kind, nrgy, hlth, state).retire()
             ActorSelected(aid).assert()
 
             //guard(nrgy gt Level(3f))
 
             guard { it[nrgy].value > 3 }
 
-            effect(activation = Both) { sol ->
-                when (sol) {
-                    is Assert -> {
-                        val v = sol[nrgy].inc(-3f)
-                        Actor(aid, pid, kind, const(v)).assert()
-                        onMove = true
-                        //println("ASSERT: Actor[$v] ${sol[aid]} move on tile ${sol[cid]}.")
-                    }
-                    is Retire -> {}
-                        //println("RETIRE: Actor ${sol[aid]} move on tile ${sol[cid]}.")
-                }
+            effect { sol ->
+                val v = sol[nrgy].inc(-3f)
+                Actor(aid, pid, kind, const(v), hlth, state).assert()
+                onMove = true
             }
         }
 
         rule { // On Attack
+
             TapActor(aid).retire()
-            retire(
-                    Actor(aid, pid, kind, nrgy),
+
+            retire( Actor(aid, pid, kind, nrgy, hlth, state),
                     At(aid, cid))
+
             assert(Adjacent(cid, cid1),
                     At(aid1, cid1),
-                    Actor(aid1, pid1, kind1, nrgy1),
+                    Actor(aid1, pid1, kind1, nrgy1, hlth1, state1),
                     ActorSelected(aid1))
-            effect(activation = Both) { sol ->
-                when (sol) {
-                    is Assert -> {
-                        onAttack = true
-                        //println("ASSERT: Actor ${sol[aid1]} attack actor ${sol[aid]}.")
-                    }
-                    is Retire -> {}
-                    //println("RETIRE: Actor ${sol[aid1]} attack actor ${sol[aid]}.")
-                }
+
+            guard { it[nrgy1].value > 3 }
+
+            effect {
+                onAttack = true
             }
         }
+
+        rule { // On Deploy
+
+            TapActor(aid).retire()
+
+            retire( Actor(aid, pid, kind, nrgy, hlth, const(State.OnMarch)) )
+
+            effect { sol ->
+                val v = sol[nrgy].inc(-3f)
+                assert( Actor(aid, pid, kind, const(v), hlth, const(State.Deployed)) )
+            }
+        }
+
 
     }
 }

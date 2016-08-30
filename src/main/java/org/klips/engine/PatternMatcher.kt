@@ -23,13 +23,13 @@ class PatternMatcher(val pattern: Fact) {
             else patternIndex[facet] = mutableSetOf(i)
         }
 
-        refIndex   = patternIndex.filter { it.key is FacetRef<*> }
+        refIndex   = patternIndex.filter { it.key is FacetRef<*> } // TODO: #1 See bellow
         constIndex = patternIndex.filter { it.key is Facet.ConstFacet<*> }
 
         refIndexBind   = mutableMapOf<FacetRef<*>, Int>().apply{
             for(e in refIndex) {
                 val key = e.key
-                if(key is FacetRef<*>)
+                if(key is FacetRef<*>) // TODO: #1 Probably need to make stronger typisation for refIndex.keys
                     put(key, e.value.first())
             }
         }
@@ -37,13 +37,15 @@ class PatternMatcher(val pattern: Fact) {
     }
 
     fun match(fact: Fact): Boolean {
-        if(fact.javaClass != pattern.javaClass)
+
+        if(!fact.javaClass.isAssignableFrom(pattern.javaClass))
             return false
+
         for(i in 0 .. pattern.facets.size - 1)
         {
             val f = pattern.facets[i]
 
-            if(!fact.facets[i].match(f)) return false
+            if(!f.match(fact.facets[i])) return false
         }
 
         return refIndex.all {
