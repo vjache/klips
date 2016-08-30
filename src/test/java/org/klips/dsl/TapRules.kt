@@ -6,6 +6,8 @@ class TapRules : RuleSet() {
 
     var onMove = false
     var onAttack = false
+    var onDeploy = false
+
 
     val cid = ref<CellId>("cid")
     val cid1 = ref<CellId>("cid1")
@@ -22,16 +24,18 @@ class TapRules : RuleSet() {
     val state = ref<State>("state")
     val state1 = ref<State>("state1")
 
+
+
     init {
 
-        rule { // Symmetry of adjacency
+        rule(group = "Adj-Symmetry") { // Symmetry of adjacency
             Adjacent(cid, cid1).assert()
             effect {
                 Adjacent(cid1, cid).assert()
             }
         }
 
-        rule { // On Move
+        rule(group = "Move") { // On Move
 
             TapCell(cid).retire()
             Adjacent(cid, cid1).assert()
@@ -50,7 +54,7 @@ class TapRules : RuleSet() {
             }
         }
 
-        rule { // On Attack
+        rule(group = "Attack") { // On Attack
 
             TapActor(aid).retire()
 
@@ -69,15 +73,16 @@ class TapRules : RuleSet() {
             }
         }
 
-        rule { // On Deploy
+        rule(group = "Deploy") { // On Deploy
 
             TapActor(aid).retire()
-
-            retire( Actor(aid, pid, kind, nrgy, hlth, const(State.OnMarch)) )
+            Actor(aid, pid, kind, nrgy, hlth, const(State.OnMarch)).retire()
+            ActorSelected(aid).retire()
 
             effect { sol ->
                 val v = sol[nrgy].inc(-3f)
                 assert( Actor(aid, pid, kind, const(v), hlth, const(State.Deployed)) )
+                onDeploy = true
             }
         }
 

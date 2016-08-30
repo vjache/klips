@@ -27,24 +27,21 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
 
         override fun flush() : ReteInput {
             // While there are effects do ...
-            while (!effectsQueue.isEmpty()) {
+            while (effectsQueue.isNotEmpty() || agenda.isNotEmpty()) {
                 // 1. Apply effects to appropriate a-nodes
                 while (!effectsQueue.isEmpty()) {
                     val mdf = effectsQueue.remove()
                     log(mdf)
                     // TODO: Elaborate faster a-node selection
                     for (anode in alphaLayer) {
-                        if (anode.accept(mdf)) {
-                            break
-                        }
+                        anode.accept(mdf)
                     }
                 }
 
-                //2. While there are activated rule clauses in agenda ...
-                while (!agenda.isEmpty()) {
+                //2. If there is an activated rule clause in agenda ...
+                if (agenda.isNotEmpty()) {
                     // 2.1. Take first activation
                     val (sol, ruleClause) = agenda.remove()
-
                     // 2.2. Fire trigger! Do side effects and enqueue working memory modifications.
                     ruleClause.trigger.fire(sol) { mdf ->
                         effectsQueue.add(mdf)
@@ -117,21 +114,22 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
                 override fun consume(source:
                                      Node, mdf: Modification<Binding>) {
                     val entry = Pair(mdf, unifiedPatterns.second[i])
+                    val group = unifiedPatterns.second[i].group
                     when (mdf) {
                     // Rule clause activated -- place it to agenda
                         is Assert -> {
-                            agenda.add( log(entry, "+A ") )
+                            agenda.add( log(entry, "+A [$group]") )
                         }
                     // Rule clause deactivated -- remove it from agenda
                         is Retire -> {
                             val antiEntry = Pair(mdf.inverse(), unifiedPatterns.second[i])
                             if (!agenda.remove( antiEntry ))
                             {
-                                log(entry, "+A ")
+                                log(entry, "+A [$group]")
                                 agenda.add(entry)
                             }
                             else
-                                log(entry, "-A ")
+                                log(antiEntry, "-A [$group]")
                         }
                     }
                 }

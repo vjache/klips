@@ -81,4 +81,15 @@ class RuleDslTest {
 
         assertTrue("Attack must happen.") { r.onAttack }
     }
+
+    @Test
+    fun onDeployTest(){
+        val r = TapRules()
+        r.input.assert(
+                Actor(100, 1000, ActorKind.Comm, 100f, 100f, State.OnMarch),
+                ActorSelected(100)
+        ).blink(TapActor(100))
+
+        assertTrue("Deploy must happen.") { r.onDeploy }
+    }
 }
