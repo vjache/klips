@@ -4,15 +4,17 @@ import org.klips.dsl.Guard.BinaryPredicate.Code.*
 import java.util.*
 
 @Suppress("unused")
-interface Facet<T> : Comparable<Facet<*>> {
+abstract class Facet<T> : Comparable<Facet<*>> {
 
     @Suppress("UNCHECKED_CAST")
-    open class ConstFacet<T:Comparable<T>>(val value:T): Facet<T>{
+    open class ConstFacet<T : Comparable<T>>(val value : T): Facet<T>() {
 
-        override fun compareTo(other: Facet<*>): Int {
-            return if(other is ConstFacet) value.compareTo(other.value as T)
-            else javaClass.name.compareTo(other.javaClass.name)
-        }
+        override fun compareTo(other: Facet<*>) =
+                if(other is ConstFacet)
+                    value.compareTo(other.value as T)
+                else
+                    javaClass.name.compareTo(other.javaClass.name)
+
 
         override fun match(f: Facet<*>) = when(f){
             is IntervalFacet<*> ->
@@ -59,7 +61,7 @@ interface Facet<T> : Comparable<Facet<*>> {
         override fun toString() = "[$min..$max]"
     }
 
-    open class FacetRef<T:Comparable<T>>(val id: String) : Facet<T>{
+    open class FacetRef<T:Comparable<T>>(val id: String) : Facet<T>(){
 
         override fun compareTo(other: Facet<*>): Int {
             return if(other is FacetRef)
@@ -120,7 +122,7 @@ interface Facet<T> : Comparable<Facet<*>> {
     class BoolFacet(value:Boolean) :
             ConstFacet<Boolean>(value) {}
 
-    fun match(f: Facet<*>): Boolean
+    abstract fun match(f: Facet<*>): Boolean
 
     fun bind(f: Facet<*>): Pair<Facet<*>, Facet<*>>? = if (match(f)) Pair(f, this) else null
 

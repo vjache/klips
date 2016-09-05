@@ -7,13 +7,14 @@ import org.klips.dsl.Facet
 import org.klips.dsl.Facet.FacetRef
 import org.klips.dsl.Facet.IntFacet
 import org.klips.dsl.Fact
+import org.klips.dsl.ref
 import org.klips.engine.PatternMatcher
 import kotlin.test.assertEquals
 
 
 class FactBindingSetTest {
 
-    class Adjacent(aid1: Facet<Int>, aid2: Facet<Int>) : Fact(aid1, aid2){
+    class Adjacent(val aid1: Facet<Int> = ref(), val aid2: Facet<Int> = ref()) : Fact(){
         constructor(a1: Int, a2:Int ):this(IntFacet(a1), IntFacet(a2))
     }
 

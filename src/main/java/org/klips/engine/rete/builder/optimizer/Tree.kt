@@ -55,12 +55,12 @@ abstract class Tree : Cloneable {
 //
 //    fun findMaxMatch(index:Map<Signature, MutableSet<Tree>>): Triple<Tree, Tree, Binding>? {
 //        index.values.activation { it.size > 1 }.reversed().forEach { group0 ->
-//            val group  = group0.toList()
+//            val name  = group0.toList()
 //
-//            for(i in 0..group.size-1)
-//                for(j in i+1..group.size-1){
-//                    group[i].bind(group[j])?.let {
-//                        return Triple(group[i], group[j], it)
+//            for(i in 0..name.size-1)
+//                for(j in i+1..name.size-1){
+//                    name[i].bind(name[j])?.let {
+//                        return Triple(name[i], name[j], it)
 //                    }
 //                }
 //        }

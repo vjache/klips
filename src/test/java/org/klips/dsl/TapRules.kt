@@ -1,6 +1,8 @@
 package org.klips.dsl
 
 import org.klips.engine.*
+import org.klips.engine.State.Deployed
+import org.klips.engine.State.OnMarch
 
 class TapRules : RuleSet() {
 
@@ -28,43 +30,39 @@ class TapRules : RuleSet() {
 
     init {
 
-        rule(group = "Adj-Symmetry") { // Symmetry of adjacency
-            Adjacent(cid, cid1).assert()
+        rule(name = "Adj-Symmetry") { // Symmetry of adjacency
+            +Adjacent(cid, cid1)
             effect {
-                Adjacent(cid1, cid).assert()
+                +Adjacent(cid1, cid)
             }
         }
 
-        rule(group = "Move") { // On Move
+        rule(name = "Move") { // On Move
 
-            TapCell(cid).retire()
-            Adjacent(cid, cid1).assert()
-            At(aid, cid1).assert()
-            Actor(aid, pid, kind, nrgy, hlth, state).retire()
-            ActorSelected(aid).assert()
-
-            //guard(nrgy gt Level(3f))
+            -TapCell(cid)
+            +Adjacent(cid, cid1)
+            +At(aid, cid1)
+            -Actor(aid, pid, kind, nrgy, hlth, state)
+            +ActorSelected(aid)
 
             guard { it[nrgy].value > 3 }
 
             effect { sol ->
-                val v = sol[nrgy].inc(-3f)
-                Actor(aid, pid, kind, const(v), hlth, state).assert()
+                val v = sol[nrgy].inc(-3f).facet
+                +Actor(aid, pid, kind, v, hlth, state)
                 onMove = true
             }
         }
 
-        rule(group = "Attack") { // On Attack
+        rule(name = "Attack") { // On Attack
 
-            TapActor(aid).retire()
-
-            retire( Actor(aid, pid, kind, nrgy, hlth, state),
-                    At(aid, cid))
-
-            assert(Adjacent(cid, cid1),
-                    At(aid1, cid1),
-                    Actor(aid1, pid1, kind1, nrgy1, hlth1, state1),
-                    ActorSelected(aid1))
+            +TapActor(aid)
+            -Actor(aid, pid, kind)
+            -At(aid, cid)
+            +Adjacent(cid, cid1)
+            +At(aid1, cid1)
+            +Actor(aid1, pid1, kind1, nrgy1, hlth1)
+            +ActorSelected(aid1)
 
             guard { it[nrgy1].value > 3 }
 
@@ -73,15 +71,15 @@ class TapRules : RuleSet() {
             }
         }
 
-        rule(group = "Deploy") { // On Deploy
+        rule(name = "Deploy") { // On Deploy
 
-            TapActor(aid).retire()
-            Actor(aid, pid, kind, nrgy, hlth, const(State.OnMarch)).retire()
-            ActorSelected(aid).retire()
+            -TapActor(aid)
+            -Actor(aid, pid, kind, nrgy, hlth, OnMarch.facet)
+            -ActorSelected(aid)
 
             effect { sol ->
                 val v = sol[nrgy].inc(-3f)
-                assert( Actor(aid, pid, kind, const(v), hlth, const(State.Deployed)) )
+                +Actor(aid, pid, kind, v.facet, hlth, Deployed.facet)
                 onDeploy = true
             }
         }

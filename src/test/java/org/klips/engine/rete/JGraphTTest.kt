@@ -17,10 +17,11 @@ import org.jgrapht.graph.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.klips.dsl.ref
 
 class JGraphTTest {
 
-    class Adjacent(aid1: Facet<Int>, aid2: Facet<Int>) : Fact(aid1, aid2){
+    class Adjacent(val aid1: Facet<Int> = ref(), val aid2: Facet<Int> = ref()) : Fact(){
         constructor(a1: Int, a2:Int ):this(IntFacet(a1), IntFacet(a2))
     }
 

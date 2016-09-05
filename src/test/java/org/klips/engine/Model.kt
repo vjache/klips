@@ -1,9 +1,12 @@
+@file:Suppress("unused")
+
 package org.klips.engine
 
 import org.klips.dsl.Facet
 import org.klips.dsl.Facet.ConstFacet
 import org.klips.dsl.Facet.IntFacet
 import org.klips.dsl.Fact
+import org.klips.dsl.ref
 
 /////////////////////////////////////////////////////////////////////////////////
 data class CellId(val id: Int) : Comparable<CellId> {
@@ -70,37 +73,37 @@ data class Level(val value: Float, val maxValue: Float) : Comparable<Level> {
 
 /////////////////////////////////////////////////////////////////////////////////
 
-class Adjacent(cid1: Facet<CellId>, cid2: Facet<CellId>) : Fact(cid1, cid2) {
+class Adjacent(val cid1: Facet<CellId> = ref(), val cid2: Facet<CellId> = ref()) : Fact() {
     constructor(cid1: Int, cid2: Int) :
     this(ConstFacet(CellId(cid1)), ConstFacet(CellId(cid2)))
 }
 
-class At(aid: Facet<ActorId>, cid: Facet<CellId>) : Fact(aid, cid) {
+class At(val aid: Facet<ActorId> = ref(), val cid: Facet<CellId> = ref()) : Fact() {
     constructor(aid: Int, cid: Int) :
     this(ConstFacet(ActorId(aid)), ConstFacet(CellId(cid)))
 }
 
-class Land(cid: Facet<CellId>, type: Facet<LandKind>) : Fact(cid, type) {
+class Land(val cid: Facet<CellId> = ref(), val type: Facet<LandKind> = ref()) : Fact() {
     constructor(cid: Int, type: LandKind) :
     this(ConstFacet(CellId(cid)), ConstFacet(type))
 }
 
-class Resource(cid: Facet<CellId>,
-               type: Facet<ResourceType>,
-               amount: Facet<Int>) : Fact(cid, type, amount) {
+class Resource(val cid: Facet<CellId> = ref(),
+               val type: Facet<ResourceType> = ref(),
+               val amount: Facet<Int> = ref()) : Fact() {
     constructor(cid: Int,
                 type: ResourceType,
                 amount: Int) :
     this(ConstFacet(CellId(cid)), ConstFacet(type), IntFacet(amount))
 }
 
-class Actor(aid: Facet<ActorId>,
-            pid: Facet<PlayerId>,
-            type: Facet<ActorKind>,
-            energy: Facet<Level>,
-            health: Facet<Level>,
-            state: Facet<State>) :
-        Fact(aid, pid, type, energy, health, state) {
+class Actor(val aid:    Facet<ActorId> = ref(),
+            val pid:    Facet<PlayerId> = ref(),
+            val type:   Facet<ActorKind> = ref(),
+            val energy: Facet<Level> = ref(),
+            val health: Facet<Level> = ref(),
+            val state:  Facet<State> = ref()) : Fact() {
+
 
     constructor(id: Int, pid: Int, type: ActorKind) :
     this(id, pid, type, 100f, 100f, State.OnMarch)
@@ -116,28 +119,28 @@ class Actor(aid: Facet<ActorId>,
 }
 
 
-class Player(pid: Facet<PlayerId>, color: Facet<PlayerColor>) :
-        Fact(pid, color) {
+class Player(val pid: Facet<PlayerId> = ref(), val color: Facet<PlayerColor> = ref()) :
+        Fact() {
     constructor(pid: Int, color: PlayerColor) :
     this(ConstFacet(PlayerId(pid)), ConstFacet(color))
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 
-class TapCell(cid: Facet<CellId>) :
-        Fact(cid) {
+class TapCell(val cid: Facet<CellId> = ref()) :
+        Fact() {
     constructor(cid: Int) :
     this(ConstFacet(CellId(cid)))
 }
 
-class TapActor(aid: Facet<ActorId>) :
-        Fact(aid) {
+class TapActor(val aid: Facet<ActorId> = ref()) :
+        Fact() {
     constructor(aid: Int) :
     this(ConstFacet(ActorId(aid)))
 }
 
-class ActorSelected(aid: Facet<ActorId>) :
-        Fact(aid) {
+class ActorSelected(val aid: Facet<ActorId> = ref()) :
+        Fact() {
     constructor(aid: Int) :
     this(ConstFacet(ActorId(aid)))
 }

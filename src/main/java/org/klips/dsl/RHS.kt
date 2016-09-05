@@ -1,9 +1,8 @@
 package org.klips.dsl
 
-import org.klips.engine.Binding
-import org.klips.dsl.ActivationFilter
-import org.klips.engine.Modification
 import org.klips.dsl.ActivationFilter.*
+import org.klips.engine.Binding
+import org.klips.engine.Modification
 
 
 class RHS(private val filter : ActivationFilter?, private val initBlock: RHS.(Modification<Binding>) -> Unit) : AsserterTrait() {

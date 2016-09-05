@@ -6,27 +6,26 @@ import org.klips.engine.rete.builder.StrategyOneMem
 
 open class RuleSet : FacetBuilder() {
 
-  private val rules: MutableList<Rule> = mutableListOf()
+    private val rules: MutableList<Rule> = mutableListOf()
 
-  private var rete: ReteBuilderStrategy? = null
+    private var rete: ReteBuilderStrategy? = null
 
-  private var defaultPrioClock = 0.0
+    private var defaultPrioClock = 0.0
 
-  val input: ReteInput
-    get() {
-      if (rete == null) {
-        rete = StrategyOneMem(rules.map { it.toInternal() })
-      }
+    val input: ReteInput
+        get() {
+            if (rete == null) {
+                rete = StrategyOneMem(rules.map { it.toInternal() })
+            }
 
-      return rete!!.input
+            return rete!!.input
+        }
+
+    fun rule(name: String = "*", priority: Double? = null, init: Rule.() -> RHS) {
+        val lhs = Rule(name, priority ?: defaultPrioClock)
+        defaultPrioClock += 100.0
+        lhs.init()
+        rules.add(lhs)
+        rete = null
     }
-
-  fun rule(group: String = "*", priority: Double? = null, init: Rule.() -> RHS) {
-    val lhs = Rule(group, priority ?: defaultPrioClock)
-    defaultPrioClock += 100.0
-    lhs.init()
-    rules.add(lhs)
-    rete = null
-  }
-
 }
