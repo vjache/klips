@@ -11,6 +11,7 @@ import org.jgrapht.EdgeFactory
 import org.jgrapht.WeightedGraph
 import org.klips.engine.Modification.Assert
 import org.klips.engine.Modification.Retire
+import org.klips.engine.rete.ReteInput.NotTriggeredException
 import java.util.*
 
 @Suppress("UNCHECKED_CAST")
@@ -25,9 +26,12 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
 
         val effectsQueue = LinkedList<Modification<out Fact>>()
 
-        override fun flush() : ReteInput {
+        override fun flush(vararg expect:String) : ReteInput {
+            val triggered = mutableSetOf<String>()
+            var iterCnt = 1
             // While there are effects do ...
             while (effectsQueue.isNotEmpty() || agenda.isNotEmpty()) {
+                log("--- ${iterCnt++} ---")
                 // 1. Apply effects to appropriate a-nodes
                 while (!effectsQueue.isEmpty()) {
                     val mdf = effectsQueue.remove()
@@ -46,9 +50,20 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
                     ruleClause.trigger.fire(sol) { mdf ->
                         effectsQueue.add(mdf)
                     }
+
+                    if (expect.size > 0) triggered.add(ruleClause.group)
                 }
 
             }
+
+            if (expect.size > 0) {
+                val notTriggered = expect.filter { it !in triggered }
+
+                if (notTriggered.isNotEmpty())
+                    throw NotTriggeredException(notTriggered)
+            }
+
+            log("--- finish ---")
             return this
         }
 

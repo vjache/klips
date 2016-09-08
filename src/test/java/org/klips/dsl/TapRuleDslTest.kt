@@ -6,7 +6,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 
-class RuleDslTest {
+class TapRuleDslTest {
 
     @Test
     fun onMoveTest() {

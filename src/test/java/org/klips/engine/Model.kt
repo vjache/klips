@@ -126,6 +126,8 @@ class Player(val pid: Facet<PlayerId> = ref(), val color: Facet<PlayerColor> = r
 }
 
 /////////////////////////////////////////////////////////////////////////////////
+// UI events
+/////////////////////////////////////////////////////////////////////////////////
 
 class TapCell(val cid: Facet<CellId> = ref()) :
         Fact() {
@@ -144,3 +146,69 @@ class ActorSelected(val aid: Facet<ActorId> = ref()) :
     constructor(aid: Int) :
     this(ConstFacet(ActorId(aid)))
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////
+// Command events
+/////////////////////////////////////////////////////////////////////////////////
+
+open class UnaryCommand(
+        val actingAgent: Facet<ActorId> = ref()) : Fact()
+
+open class AgentToAgentCommand(
+        actingAgent: Facet<ActorId> = ref(),
+        val passiveAgentId: Facet<ActorId> = ref()) : UnaryCommand(actingAgent)
+
+class MoveCommand(
+        actingAgent: Facet<ActorId> = ref(),
+        val targetCell: Facet<CellId>  = ref()) :
+        UnaryCommand(actingAgent)
+
+class CreateAgentCommand(
+        actingAgent : Facet<ActorId> = ref(),
+        val cellId    : Facet<CellId>  = ref(),
+        val agentType : Facet<ActorKind>   = ref()) :
+        UnaryCommand( actingAgent )
+
+class DeployCommand(
+        actingAgent : Facet<ActorId> = ref()) :
+        UnaryCommand(actingAgent)
+
+class UndeployCommand(
+        actingAgent : Facet<ActorId> = ref()) :
+        UnaryCommand(actingAgent)
+
+class AttackCommand(
+        actingAgent: Facet<ActorId> = ref(),
+        passiveAgentId: Facet<ActorId> = ref()) :
+        AgentToAgentCommand(
+                actingAgent,
+                passiveAgentId)
+
+class ChargeCommand(
+        actingAgent: Facet<ActorId> = ref(),
+        passiveAgentId: Facet<ActorId> = ref()) :
+        AgentToAgentCommand(
+                actingAgent,
+                passiveAgentId)
+
+class FeedAimCommand(
+        actingAgent: Facet<ActorId> = ref(),
+        passiveAgentId: Facet<ActorId> = ref()) :
+        AgentToAgentCommand(
+                actingAgent,
+                passiveAgentId)
+
+class RepairCommand(
+        actingAgent: Facet<ActorId> = ref(),
+        passiveAgentId: Facet<ActorId> = ref()) :
+        AgentToAgentCommand(
+                actingAgent,
+                passiveAgentId)
+
+class ScrapCommand(
+        actingAgent: Facet<ActorId> = ref(),
+        passiveAgentId: Facet<ActorId> = ref()) :
+        AgentToAgentCommand(
+                actingAgent,
+                passiveAgentId)

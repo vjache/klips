@@ -3,6 +3,7 @@ package org.klips.engine
 import org.junit.Test
 import org.klips.dsl.Facet
 import org.klips.dsl.Facet.FacetRef
+import org.klips.dsl.facet
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -22,9 +23,48 @@ class PatternMatcherTest {
         val fact1 = Actor(aid, pid, kind, nrgy, hlth, Facet.ConstFacet(State.OnMarch))
         val fact2 = Actor(aid, pid, kind, nrgy, hlth, state)
         val b1 = PatternMatcher(fact2).bind(fact1)
+        assertNotNull(b1)
         println("$b1")
         val b2 = PatternMatcher(fact1).bind(fact2)
+        assertNull(b2)
         println("$b2")
+    }
+
+    @Test
+    fun bindSubclass() {
+
+        val fact = MoveCommand(
+                actingAgent = ActorId(0).facet,
+                targetCell = CellId(0).facet)
+
+        val fact2 = AttackCommand(
+                actingAgent  = ActorId(10).facet,
+                passiveAgentId = ActorId(1).facet)
+
+        val pattern = UnaryCommand(aid)
+        val b1 = PatternMatcher(pattern).bind(fact)
+        assertNotNull(b1)
+        val b2 = PatternMatcher(pattern).bind(fact2)
+        assertNotNull(b2)
+
+        assertEquals(ActorId(0).facet, b1!![aid])
+        assertEquals(ActorId(10).facet, b2!![aid])
+
+        val pattern2 = AgentToAgentCommand()
+        pattern2.substitute { it }
+        assertNull(PatternMatcher(pattern2).bind(fact))
+        assertNotNull(PatternMatcher(pattern2).bind(fact2))
+
+    }
+
+    @Test
+    fun bindSuperclass() {
+        val pattern = MoveCommand()
+        val fact = UnaryCommand(actingAgent = ActorId(0).facet)
+
+        val b1 = PatternMatcher(pattern).bind(fact)
+
+        assertNull(b1)
     }
 
     @Test

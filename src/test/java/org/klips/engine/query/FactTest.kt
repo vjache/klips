@@ -12,6 +12,19 @@ import kotlin.test.assertNotEquals
 class FactTest {
 
     @Test
+    fun testClone() {
+        Actor().substitute { it }
+        Player().substitute { it }
+        Adjacent().substitute { it }
+        At().substitute { it }
+        Land().substitute { it }
+        Resource().substitute { it }
+        TapActor().substitute { it }
+        TapCell().substitute { it }
+        ActorSelected().substitute { it }
+    }
+
+    @Test
     fun patternEqualities(){
         assertEquals(
                 Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),

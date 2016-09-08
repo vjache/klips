@@ -6,6 +6,11 @@ import org.klips.engine.Modification.Assert
 import org.klips.engine.Modification.Retire
 
 interface ReteInput {
+
+  class NotTriggeredException(val expect: Collection<String>) : RuntimeException() {
+    override fun toString() = "Expected rule groups are not triggered: $expect"
+  }
+
   fun modify(vararg mdfs: Modification<out Fact>) : ReteInput
 
   fun assert(vararg facts: Fact) = modify(*Array(facts.size){Assert(facts[it])})
@@ -13,16 +18,26 @@ interface ReteInput {
 
   fun blink(vararg facts:Fact)   = assert(*facts).flush().retire(*facts).flush()
 
-  fun flush() : ReteInput
+  fun flush(vararg expect:String) : ReteInput
 
   fun Fact.assert() = assert(this)
   fun Fact.retire() = retire(this)
 
+  operator fun Fact.unaryPlus():Fact {
+    assert(this)
+    return this
+  }
+
+  operator fun Fact.unaryMinus():Fact {
+    retire(this)
+    return this
+  }
+
   fun Fact.blink() = blink(this)
 
-  fun flush(block: ReteInput.() -> Unit): ReteInput {
+  fun flush(vararg expect:String, block: ReteInput.() -> Unit): ReteInput {
     block()
-    return flush()
+    return flush(*expect)
   }
 
 }

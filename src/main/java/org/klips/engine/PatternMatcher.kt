@@ -11,6 +11,7 @@ class PatternMatcher(val pattern: Fact) {
     private val refIndex       : Map<Facet<*>, MutableSet<Int>>
     private val refIndexBind   : Map<FacetRef<*>, Int>
     private val constIndex     : Map<Facet<*>, MutableSet<Int>>
+    private val patternJavaClass = pattern.javaClass
 
     val refs : Set<FacetRef<*>>
         get() = refIndexBind.keys
@@ -38,14 +39,15 @@ class PatternMatcher(val pattern: Fact) {
 
     fun match(fact: Fact): Boolean {
 
-        if(!fact.javaClass.isAssignableFrom(pattern.javaClass))
+        val actJavaClass = fact.javaClass
+
+        if(!patternJavaClass.isAssignableFrom(actJavaClass))
             return false
 
-        for(i in 0 .. pattern.facets.size - 1)
-        {
+        for (i in 0..pattern.facets.size - 1) {
             val f = pattern.facets[i]
 
-            if(!f.match(fact.facets[i])) return false
+            if (!f.match(fact.facets[i])) return false
         }
 
         return refIndex.all {

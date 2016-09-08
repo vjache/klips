@@ -2,18 +2,45 @@ package org.klips.dsl
 
 import org.klips.engine.Binding
 import java.lang.reflect.Field
-import kotlin.reflect.KFunction
-import kotlin.reflect.KProperty
+import kotlin.reflect.*
 import kotlin.reflect.jvm.kotlinProperty
-import kotlin.reflect.primaryConstructor
 
 abstract class Fact() : Cloneable {
 
-    private val facetsByName: Map<String, Facet<*>>
-        get() {
-            val fields = classMeta(this).second
-            return fields.mapValues { it.value.call(this) as Facet<*> }
+    private val facetsByName: Map<String, Facet<*>> by lazy {
+        val fields = classMeta.second
+        fields.mapValues {
+            it.value.call(this) as org.klips.dsl.Facet<*>
         }
+    }
+
+    private val classMeta: Pair<KFunction<*>, Map<String, KProperty.Getter<*>>> = let {
+            val jc = this.javaClass
+            metadataByClass.getOrPut(jc){
+                val kClass = jc.kotlin
+                val fields = fields(jc)
+                val primaryConstructor = kClass.primaryConstructor!!
+                val parameters = primaryConstructor.parameters
+                val primConstrParamNames = parameters.map { it.name }
+                validateConstructorParameters(kClass, parameters, fields)
+                val fieldsByName = fields.filter {
+                    it.type == org.klips.dsl.Facet::class.java && it.name in primConstrParamNames
+                }.map {
+                    kotlin.Pair(it.name, it.kotlinProperty!!.getter)
+                }.toMap()
+                kotlin.Pair(primaryConstructor, fieldsByName)
+            }
+        }
+
+    private fun validateConstructorParameters(kclass : KClass<out Fact>, parameters: List<KParameter>, fields: List<Field>) {
+        val fieldNames = fields.map { it.name }
+        val paramNames = parameters.map { it.name }
+        val badParams  = paramNames.filter { it !in fieldNames }
+        if(badParams.isNotEmpty())
+            throw IllegalArgumentException(
+                    "Primary constructor parameters of $kclass " +
+                            "do not match fields: $badParams")
+    }
 
     private companion object Metadata {
         val metadataByClass = mutableMapOf<
@@ -25,27 +52,12 @@ abstract class Fact() : Cloneable {
         if(cls != null)
         {
             return mutableListOf<Field>().apply {
-                addAll(cls.declaredFields)
                 addAll(fields(cls.superclass))
+                addAll(cls.declaredFields)
             }
         }
         else {
             return emptyList()
-        }
-    }
-    private fun classMeta(obj:Any): Pair<KFunction<*>, Map<String, KProperty.Getter<*>>> {
-        val jc = obj.javaClass
-        return metadataByClass.getOrPut(jc){
-            val fields = fields(jc)
-            val kClass = jc.kotlin
-            val primaryConstructor = kClass.primaryConstructor!!
-            val primConstrParamNames = primaryConstructor.parameters.map { it.name }
-            val fieldsByName = fields.filter {
-                it.type == Facet::class.java && it.name in primConstrParamNames
-            }.map {
-                Pair(it.name, it.kotlinProperty!!.getter)
-            }.toMap()
-            Pair(primaryConstructor, fieldsByName)
         }
     }
 
@@ -56,7 +68,7 @@ abstract class Fact() : Cloneable {
     get() = facets.filter { it is Facet.FacetRef<*> } as List<Facet.FacetRef<*>>
 
     fun substitute(action:(Facet<*>) -> Facet<*>?) : Fact {
-        val (constr, fields) = classMeta(this)
+        val (constr, fields) = classMeta
         val args = constr.parameters.map {
             val arg = fields[it.name]!!.call(this)
             if (arg is Facet<*>)
@@ -79,6 +91,11 @@ abstract class Fact() : Cloneable {
 
     fun substitute(data:Binding) = substitute{
         data[it]
+    }
+
+    fun substitute(vararg substs : Pair<Facet<*>, Facet<*>>) : Fact{
+        val data = mapOf(*substs)
+        return substitute{ data[it] }
     }
 
     override fun hashCode(): Int {
