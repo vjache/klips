@@ -8,14 +8,20 @@ import org.klips.engine.query.JoinBindingSet.JoinType.FullOuter
 import org.klips.engine.rete.AlphaNode
 import org.klips.engine.rete.Node
 import org.klips.engine.rete.ReteInput
+import org.klips.engine.rete.printTree
+import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 abstract class ReteBuilderStrategy(patterns : List<RuleClause>) {
+
+    companion object nodeActivity : MutableMap<Node, Pair<AtomicInteger,AtomicInteger>> by HashMap()
 
     protected val unifiedPatterns = findBestSubstitutions(patterns)
 
     abstract val input      : ReteInput
     abstract val alphaLayer : Set<AlphaNode>
     abstract val allNodes   : Set<Node>
+    abstract val roots      : List<Node>
 
     private fun findBestSubstitutions(patts: List<RuleClause>):
             Pair<List<Map<Facet<*>, Facet<*>>>,
@@ -51,6 +57,12 @@ abstract class ReteBuilderStrategy(patterns : List<RuleClause>) {
         val m = mutableMapOf<Facet<*>, Facet<*>>()
         for ((k,v) in b.entries)
         {
+            if (k is Facet.ConstFacet && k != v)
+                return false
+
+            if (v is Facet.ConstFacet && k != v)
+                return false
+
             val k0 = m[v]
             if(k0 == null) {
                 m[v] = k
@@ -72,5 +84,13 @@ abstract class ReteBuilderStrategy(patterns : List<RuleClause>) {
                 else null
             }
         }.toSet(), decMap)
+    }
+
+    fun printSummary() {
+        roots.forEachIndexed { i, proxyNode ->
+            val group = unifiedPatterns.second[i].group
+            println("Rete for '$group':")
+            proxyNode.printTree()
+        }
     }
 }

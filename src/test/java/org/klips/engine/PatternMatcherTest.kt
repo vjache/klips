@@ -3,6 +3,7 @@ package org.klips.engine
 import org.junit.Test
 import org.klips.dsl.Facet
 import org.klips.dsl.Facet.FacetRef
+import org.klips.dsl.Fact
 import org.klips.dsl.facet
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -98,6 +99,35 @@ class PatternMatcherTest {
         assertEquals(ref<Int>("id1"), patt1.bind(Adjacent(ref("id1"), ref("id1")))!![ref<Int>("aid1")])
 
     }
+
+    @Test
+    fun absurdBinding() {
+        notBindable(
+                AttackCommand(ref("aid"), ref("aid1")),
+                ChargeCommand(ref("aid"), ref("aid1")))
+
+        notBindable(
+                ChargeCommand(ref("aid"), ref("aid1")),
+                AttackCommand(ref("aid"), ref("aid1")))
+
+        notBindable(
+                AttackCommand(ref("aid"), ref("aid1")).substitute { it },
+                ChargeCommand(ref("aid"), ref("aid1")).substitute { it })
+
+        notBindable(
+                ChargeCommand(ref("aid"), ref("aid1")).substitute { it },
+                AttackCommand(ref("aid"), ref("aid1")).substitute { it })
+    }
+
+    fun bindable(f1:Fact, f2:Fact) {
+        assertNotNull(PatternMatcher(f1).bind(f2))
+    }
+
+    fun notBindable(f1:Fact, f2:Fact) {
+        assertNull(PatternMatcher(f1).bind(f2))
+    }
+
+    fun Fact.match(f:Fact) = PatternMatcher(this).bind(f)
 
     fun <T : Comparable<T>> ref(id:String) = FacetRef<T>(id)
     fun <T : Comparable<T>> const(v:T) = Facet.ConstFacet(v)

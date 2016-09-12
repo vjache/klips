@@ -35,11 +35,9 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
                 // 1. Apply effects to appropriate a-nodes
                 while (!effectsQueue.isEmpty()) {
                     val mdf = effectsQueue.remove()
-                    log(mdf)
                     // TODO: Elaborate faster a-node selection
-                    for (anode in alphaLayer) {
-                        anode.accept(mdf)
-                    }
+                    log(mdf)
+                    alphaLayer.forEach { it.accept(mdf) }
                 }
 
                 //2. If there is an activated rule clause in agenda ...
@@ -75,6 +73,7 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
 
     override val alphaLayer: Set<AlphaNode>
     override val allNodes: Set<Node>
+    override val roots: List<Node>
 
     init {
 
@@ -118,18 +117,19 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
         //TODO : Bind remaining rete node with trigger
         //...
 
-        workGraphsSorted.forEachIndexed { i, workGraph ->
+        roots = workGraphsSorted.mapIndexed { i, workGraph ->
             val node = workGraph.vertexSet().first()
             val binding = unifiedPatterns.first[i]
 
             // TODO : reverse binding
             val rbinding = SimpleBinding(binding.map { Pair(it.value, it.key) })
             // TODO : make p-node pass refs unchanged when no renaming mapping
-            ProxyNode(node, rbinding).addConsumer(object : Consumer {
+            val group = unifiedPatterns.second[i].group
+            val proxyNode = ProxyNode(node, rbinding)
+            proxyNode.addConsumer(object : Consumer {
                 override fun consume(source:
                                      Node, mdf: Modification<Binding>) {
                     val entry = Pair(mdf, unifiedPatterns.second[i])
-                    val group = unifiedPatterns.second[i].group
                     when (mdf) {
                     // Rule clause activated -- place it to agenda
                         is Assert -> {
@@ -149,6 +149,7 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
                     }
                 }
             })
+            proxyNode
         }
 
         val nodes0 = mutableSetOf<Node>().apply {
@@ -210,13 +211,13 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
     abstract protected fun createBetaNode(f1: Node, f2: Node): BetaNode
     abstract protected fun createAlphaNode(f1: Fact): AlphaNode
 
-    private fun <T> log(obj: T, pfx:String = ""): T {
+    private fun <T> log(obj: T, pfx:String = "", mid:String = ""): T {
         when (obj) {
             is Assert<*> -> {
-                println("$pfx+ ${obj.arg}")
+                println("$pfx+$mid ${obj.arg}")
             }
             is Retire<*> -> {
-                println("$pfx- ${obj.arg}")
+                println("$pfx-$mid ${obj.arg}")
             }
             else -> {
                 println("$pfx$obj")

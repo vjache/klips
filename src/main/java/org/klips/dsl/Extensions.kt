@@ -23,3 +23,5 @@ fun <T:Comparable<T>> ref(name:String? = null) =
             FacetRef<T>("_${refCnt.andIncrement}")
         else
             FacetRef<T>(name)
+
+fun Iterable<Fact>.substitute(data:Binding) = this.map { it.substitute(data) }

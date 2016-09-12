@@ -8,18 +8,19 @@ open class RuleSet : FacetBuilder() {
 
     private val rules: MutableList<Rule> = mutableListOf()
 
-    private var rete: ReteBuilderStrategy? = null
+    var rete: ReteBuilderStrategy? = null
+    get() {
+        if (field == null)
+        {
+            field = StrategyOneMem(rules.map { it.toInternal() })
+        }
+        return field
+    }
 
     private var defaultPrioClock = 0.0
 
     val input: ReteInput
-        get() {
-            if (rete == null) {
-                rete = StrategyOneMem(rules.map { it.toInternal() })
-            }
-
-            return rete!!.input
-        }
+        get() = rete!!.input
 
     fun rule(name: String = "*", priority: Double? = null, init: Rule.() -> RHS) {
         val lhs = Rule(name, priority ?: defaultPrioClock)

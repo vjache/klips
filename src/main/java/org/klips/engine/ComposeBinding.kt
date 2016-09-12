@@ -4,8 +4,11 @@ import org.klips.dsl.Facet
 import kotlin.collections.Map.Entry
 
 class ComposeBinding(val left: Binding, val right: Binding) : Binding() {
+    data class EntryImpl(override val key: Facet<*>, override val value: Facet<*>) : Entry<Facet<*>, Facet<*>>
     override val entries: Set<Entry<Facet<*>, Facet<*>>> by lazy {
-        left.entries.union(right.entries)
+        keys.mapTo(mutableSetOf()) { k ->
+            EntryImpl(k, left.getOrElse(k){right[k]!!})
+        }
     }
     override val keys: Set<Facet<*>> by lazy {
         left.keys.union(right.keys)

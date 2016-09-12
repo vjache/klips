@@ -15,8 +15,14 @@ abstract class AlphaNode(val pattern: Fact) : Node() {
 
     fun accept(mdf:Modification<out Fact>):Boolean {
         matcher.bind(mdf.arg)?.let {
-            if(modifyCache(mdf))
+            if(modifyCache(mdf)) {
+                activationHappen()
                 notifyConsumers(mdf.inherit(it))
+            }
+            else
+            {
+                activationFailed()
+            }
             return true
         }
 

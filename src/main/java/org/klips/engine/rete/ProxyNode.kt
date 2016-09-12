@@ -30,6 +30,7 @@ class ProxyNode(node: Node, val renamingBinding: Binding) : Node(), Consumer {
     }
 
     override fun consume(source: Node, mdf: Modification<Binding>) {
+        activationHappen()
         notifyConsumers(mdf.inherit(ProxyBinding(mdf.arg)))
     }
 

@@ -79,7 +79,8 @@ abstract class Fact() : Cloneable {
                 arg
         }
         val arr:Array<Any?> = args.toTypedArray()
-        return constr.call(*arr) as Fact
+        val newFact = constr.call(*arr) as Fact
+        return newFact
     }
 
     fun substitute(what:Facet<*>, with:Facet<*>) = substitute{

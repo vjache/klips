@@ -31,4 +31,40 @@ class GameRulesTest {
             +Actor(101, 1001, ActorKind.Comm, 10f, 100f, Deployed)
         }
     }
+
+    @Test
+    fun deployCommand() {
+        GameRules().input.flush("Deploy") {
+            +DeployCommand(ActorId(100).facet)
+            +Actor(100, 1000, ActorKind.Guard, 10f, 100f, OnMarch)
+        }
+    }
+
+    @Test
+    fun undeployCommand() {
+        GameRules().input.flush("Undeploy") {
+            +UndeployCommand(ActorId(100).facet)
+            +Actor(100, 1000, ActorKind.Guard, 10f, 100f, Deployed)
+        }
+    }
+
+    @Test
+    fun chargeCommand() {
+        val gameRules = GameRules()
+        try {
+            gameRules.input.flush("Charge") {
+                +ChargeCommand(ActorId(100).facet, ActorId(101).facet)
+                +At(ActorId(100).facet, CellId(1).facet)
+                +Adjacent(CellId(1).facet, CellId(2).facet)
+                +At(ActorId(101).facet, CellId(2).facet)
+                +Actor(100, 1000, ActorKind.Solar, 10f, 100f, OnMarch)
+                +Actor(101, 1000, ActorKind.Comm, 10f, 100f, Deployed)
+            }
+            gameRules.rete!!.printSummary()
+        }
+        catch (e:Exception) {
+            gameRules.rete!!.printSummary()
+            throw e
+        }
+    }
 }
