@@ -73,7 +73,7 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
 
     override val alphaLayer: Set<AlphaNode>
     override val allNodes: Set<Node>
-    override val roots: List<Node>
+    override val roots: List<Pair<RuleClause, Node>>
 
     init {
 
@@ -117,8 +117,10 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
         //TODO : Bind remaining rete node with trigger
         //...
 
-        roots = workGraphsSorted.mapIndexed { i, workGraph ->
-            val node = workGraph.vertexSet().first()
+        val workGraphsByIndex = workGraphs.mapIndexed{ i,w -> Pair(w,i)}.toMap()
+        roots = workGraphsSorted.map { workGraph ->
+            val i       = workGraphsByIndex[workGraph]!!
+            val node    = workGraph.vertexSet().first()
             val binding = unifiedPatterns.first[i]
 
             // TODO : reverse binding
@@ -149,7 +151,7 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
                     }
                 }
             })
-            proxyNode
+            Pair(unifiedPatterns.second[i], proxyNode)
         }
 
         val nodes0 = mutableSetOf<Node>().apply {

@@ -21,7 +21,7 @@ abstract class ReteBuilderStrategy(patterns : List<RuleClause>) {
     abstract val input      : ReteInput
     abstract val alphaLayer : Set<AlphaNode>
     abstract val allNodes   : Set<Node>
-    abstract val roots      : List<Node>
+    abstract val roots      : List<Pair<RuleClause, Node>>
 
     private fun findBestSubstitutions(patts: List<RuleClause>):
             Pair<List<Map<Facet<*>, Facet<*>>>,
@@ -87,10 +87,10 @@ abstract class ReteBuilderStrategy(patterns : List<RuleClause>) {
     }
 
     fun printSummary() {
-        roots.forEachIndexed { i, proxyNode ->
-            val group = unifiedPatterns.second[i].group
+        roots.forEach{ root ->
+            val group = root.first.group
             println("Rete for '$group':")
-            proxyNode.printTree()
+            root.second.printTree()
         }
     }
 }

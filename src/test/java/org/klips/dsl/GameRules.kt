@@ -114,5 +114,31 @@ class GameRules : RuleSet() {
             }
         }
 
+        rule(name = "Repair") {
+            -RepairCommand(aid, aid1)
+            +At(aid,cid)
+            +At(aid1,cid1)
+            +Adjacent(cid,cid1)
+            val a  = -Actor(aid = aid,  energy = nrgy, type = ActorKind.Worker.facet)
+            val a1 = -Actor(aid = aid1, health = hlth1)
+
+            guard { it[nrgy].value > 5 }
+
+            effect { sol ->
+                +a.substitute(nrgy to sol[nrgy].inc(-5f).facet)
+                +a1.substitute(hlth1 to sol[hlth1].inc(2f).facet)
+            }
+        }
+
+        rule(name = "Scrap") {
+            -ScrapCommand(aid, aid1)
+            +At(aid,cid)
+            +At(aid1,cid1)
+            +Adjacent(cid,cid1)
+            +Actor(aid = aid, type = ActorKind.Aim.facet)
+            -Actor(aid = aid1)
+
+            effect { }
+        }
     }
 }
