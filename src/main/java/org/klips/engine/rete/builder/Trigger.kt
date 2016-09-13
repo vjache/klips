@@ -5,5 +5,5 @@ import org.klips.engine.Binding
 import org.klips.engine.Modification
 
 interface Trigger {
-    fun fire(solution: Modification<Binding>, addEffect: (Modification<Fact>) -> Unit)
+    fun fire(cache:MutableMap<Any,Any>, solution: Modification<Binding>, addEffect: (Modification<Fact>) -> Unit)
 }

@@ -16,10 +16,9 @@ open class RuleTestCommon {
             RuleClause(
                     setOf(*pattern),
                     object : Trigger {
-                        override fun fire(solution: Modification<Binding>, addEffect: (Modification<Fact>) -> Unit) {
+                        override fun fire(cache: MutableMap<Any, Any>, solution: Modification<Binding>, addEffect: (Modification<Fact>) -> Unit) {
                             trigger(solution, addEffect)
                         }
-
                     }
             )
 

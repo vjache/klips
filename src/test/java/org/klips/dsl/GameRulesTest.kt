@@ -111,4 +111,38 @@ class GameRulesTest {
             throw e
         }
     }
+
+    @Test
+    fun feedAimCommand() {
+        val gameRules = GameRules()
+        try {
+            gameRules.input.flush("FeedAim") {
+                +FeedAimCommand(ActorId(100).facet, ActorId(101).facet)
+                +At(ActorId(100).facet, CellId(1).facet)
+                +Adjacent(CellId(1).facet, CellId(2).facet)
+                +At(ActorId(101).facet, CellId(2).facet)
+                +Actor(100, 1000, ActorKind.Worker, 10f, 100f, OnMarch)
+                +Actor(101, 1000, ActorKind.Aim, 10f, 100f, Deployed)
+            }
+            gameRules.rete!!.printSummary()
+        } catch (e: Exception) {
+            gameRules.rete!!.printSummary()
+            throw e
+        }
+    }
+
+    @Test
+    fun passiveSolarChargeOnNewTurn() {
+        val gameRules = GameRules()
+        try {
+            gameRules.input.flush("TurnStart.Solar.Charge") {
+                +Turn(PlayerId(1000).facet)
+                +Actor(101, 1000, ActorKind.Solar, 10f, 100f, Deployed)
+            }
+            gameRules.rete!!.printSummary()
+        } catch (e: Exception) {
+            gameRules.rete!!.printSummary()
+            throw e
+        }
+    }
 }

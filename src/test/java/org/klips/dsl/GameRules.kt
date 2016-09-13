@@ -28,15 +28,14 @@ class GameRules : RuleSet() {
     val state1 = ref<State>("state1")
 
 
-
     init {
 
-            rule(name = "Adj-Symmetry") { // Symmetry of adjacency
-                +Adjacent(cid, cid1)
-                effect {
-                    +Adjacent(cid1, cid)
-                }
+        rule(name = "Adj-Symmetry") { // Symmetry of adjacency
+            +Adjacent(cid, cid1)
+            effect {
+                +Adjacent(cid1, cid)
             }
+        }
 
         rule(name = "Move") { // On Move
 
@@ -54,8 +53,6 @@ class GameRules : RuleSet() {
                 +At(aid, cid1)
             }
         }
-
-
 
         rule(name = "Deploy") {
             -DeployCommand(aid)
@@ -86,11 +83,11 @@ class GameRules : RuleSet() {
             +At(aid, cid)
             +Adjacent(cid, cid1)
             +At(aid1, cid1)
-            val a  = -Actor(aid = aid, energy = nrgy, type = Guard.facet, state = OnMarch.facet, pid = pid)
+            val a = -Actor(aid = aid, energy = nrgy, type = Guard.facet, state = OnMarch.facet, pid = pid)
             val a1 = -Actor(aid = aid1, health = hlth1, pid = pid1)
 
             guard { it[nrgy].value > 5 }
-            guard (pid ne pid1)
+            guard(pid ne pid1)
 
             effect { sol ->
                 +a.substitute(nrgy to sol[nrgy].inc(-5f).facet)
@@ -98,12 +95,12 @@ class GameRules : RuleSet() {
             }
         }
 
-        rule (name = "Charge"){
+        rule(name = "Charge") {
             -ChargeCommand(aid, aid1)
-            +At(aid,cid)
-            +At(aid1,cid1)
-            +Adjacent(cid,cid1)
-            val a  = -Actor(aid = aid,  energy = nrgy, type = ActorKind.Solar.facet)
+            +At(aid, cid)
+            +At(aid1, cid1)
+            +Adjacent(cid, cid1)
+            val a = -Actor(aid = aid, energy = nrgy, type = ActorKind.Solar.facet)
             val a1 = -Actor(aid = aid1, energy = nrgy1)
 
             guard { it[nrgy].value > 5 }
@@ -116,10 +113,10 @@ class GameRules : RuleSet() {
 
         rule(name = "Repair") {
             -RepairCommand(aid, aid1)
-            +At(aid,cid)
-            +At(aid1,cid1)
-            +Adjacent(cid,cid1)
-            val a  = -Actor(aid = aid,  energy = nrgy, type = ActorKind.Worker.facet)
+            +At(aid, cid)
+            +At(aid1, cid1)
+            +Adjacent(cid, cid1)
+            val a = -Actor(aid = aid, energy = nrgy, type = ActorKind.Worker.facet)
             val a1 = -Actor(aid = aid1, health = hlth1)
 
             guard { it[nrgy].value > 5 }
@@ -132,13 +129,37 @@ class GameRules : RuleSet() {
 
         rule(name = "Scrap") {
             -ScrapCommand(aid, aid1)
-            +At(aid,cid)
-            +At(aid1,cid1)
-            +Adjacent(cid,cid1)
+            +At(aid, cid)
+            +At(aid1, cid1)
+            +Adjacent(cid, cid1)
             +Actor(aid = aid, type = ActorKind.Aim.facet)
             -Actor(aid = aid1)
 
             effect { }
         }
+
+        rule(name = "FeedAim") {
+            -FeedAimCommand(aid, aid1)
+            +At(aid, cid)
+            +At(aid1, cid1)
+            +Adjacent(cid, cid1)
+            +Actor(aid = aid, type = ActorKind.Worker.facet)
+            -Actor(aid = aid1, type = ActorKind.Aim.facet)
+
+            effect { }
+        }
+
+        rule(name = "TurnStart.Solar.Charge") {
+            +Turn(pid)
+            val a = -Actor(pid = pid, aid = aid, energy = nrgy, type = ActorKind.Solar.facet)
+
+            onceBy(pid, aid)
+
+            effect { sol ->
+                +a.substitute(nrgy to sol[nrgy].inc(5f).facet)
+            }
+        }
+
+
     }
 }

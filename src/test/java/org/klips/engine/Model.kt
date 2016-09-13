@@ -6,6 +6,7 @@ import org.klips.dsl.Facet
 import org.klips.dsl.Facet.ConstFacet
 import org.klips.dsl.Facet.IntFacet
 import org.klips.dsl.Fact
+import org.klips.dsl.facet
 import org.klips.dsl.ref
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,10 @@ data class Level(val value: Float, val maxValue: Float) : Comparable<Level> {
 }
 
 /////////////////////////////////////////////////////////////////////////////////
+
+class Turn(val pid: Facet<PlayerId> = ref()) : Fact() {
+    constructor(pid:PlayerId) : this(pid.facet)
+}
 
 class Adjacent(val cid1: Facet<CellId> = ref(), val cid2: Facet<CellId> = ref()) : Fact() {
     constructor(cid1: Int, cid2: Int) :

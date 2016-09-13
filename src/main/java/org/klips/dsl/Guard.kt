@@ -11,11 +11,24 @@ sealed class Guard
 {
     abstract class Predicate : Guard()
 
+    class OnceBy(val group: String, vararg val facets: Facet<*>) : Guard() {
+        override fun eval(cache: MutableMap<Any, Any>, env: Modification<Binding>): Boolean {
+            val identity = Pair(group, facets.map{ env.arg[it] })
+
+            if(cache[identity] != null)
+                return false
+
+            cache[identity] = identity
+
+            return true
+        }
+    }
+
     class BinaryPredicate<T : Comparable<T>>(
             val code: Code,
             val left: Facet<T>,
             val right: Facet<T>) : Predicate(){
-        override fun eval(env: Modification<Binding>) = when (code) {
+        override fun eval(cache:MutableMap<Any,Any>, env: Modification<Binding>) = when (code) {
             Eq -> compare(env) == 0
             Ne -> compare(env) != 0
             Gt -> compare(env) > 0
@@ -62,28 +75,28 @@ sealed class Guard
     class BinaryJunction(
             val code:Junction,
             val left: Guard, val right: Guard) : Operator() {
-        override fun eval(env: Modification<Binding>) = when(code){
-            And -> left.eval(env) && right.eval(env)
-            Or  -> left.eval(env) || right.eval(env)
+        override fun eval(cache:MutableMap<Any,Any>, env: Modification<Binding>) = when(code){
+            And -> left.eval(cache, env) && right.eval(cache, env)
+            Or  -> left.eval(cache, env) || right.eval(cache, env)
         }
     }
 
     class MultiJunction(val code:Junction, vararg args: Guard) : Operator()
     {
-        override fun eval(env: Modification<Binding>) = when(code){
-            And -> juncts.all { it.eval(env) }
-            Or  -> juncts.any { it.eval(env) }
+        override fun eval(cache:MutableMap<Any,Any>, env: Modification<Binding>) = when(code){
+            And -> juncts.all { it.eval(cache, env) }
+            Or  -> juncts.any { it.eval(cache, env) }
         }
 
         val juncts = mutableListOf(*args)
     }
 
     class NotOperator(val arg: Guard) : Operator(){
-        override fun eval(env: Modification<Binding>) = !arg.eval(env)
+        override fun eval(cache:MutableMap<Any,Any>, env: Modification<Binding>) = !arg.eval(cache, env)
     }
 
     class LambdaGuard(private val lambda: (Modification<Binding>) -> Boolean) : Guard() {
-        override fun eval(env: Modification<Binding>) = lambda(env)
+        override fun eval(cache:MutableMap<Any,Any>, env: Modification<Binding>) = lambda(env)
     }
 
     ////////////////////////////////////
@@ -93,5 +106,5 @@ sealed class Guard
 
     fun not() = NotOperator(this)
 
-    abstract fun eval(env:Modification<Binding>) : Boolean
+    abstract fun eval(cache:MutableMap<Any,Any>, env:Modification<Binding>) : Boolean
 }

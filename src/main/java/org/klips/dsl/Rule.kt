@@ -13,61 +13,51 @@ import org.klips.engine.rete.builder.RuleClause
 import org.klips.engine.rete.builder.Trigger
 import kotlin.properties.Delegates.notNull
 
-class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter by AsserterTrait()
-{
+class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter by AsserterTrait() {
 
-  private val events = mutableListOf<Fact>()
-  private val guards = MultiJunction(And)
-  private var rhs by notNull<RHS>()
+    private val guards = MultiJunction(And)
+    private var rhs by notNull<RHS>()
 
-  fun event(vararg o: Fact) = events.addAll(o)
-  fun Fact.event() = event(this)
-
-  fun effect(activation: ActivationFilter = AssertOnly,
-             init: RHS.(Modification<Binding>) -> Unit): RHS
-  {
-    rhs = RHS(activation, init)
-    return rhs
-  }
-
-  fun guard(vararg g: Guard) = guard(And, *g)
-
-  fun guard(j: Junction, vararg g: Guard) =
-          guards.juncts.add(MultiJunction(j, *g))
-
-  fun guard(l: (Modification<Binding>) -> Boolean)
-  {
-      guards.juncts.add(Guard.LambdaGuard(l))
-  }
-
-  fun toInternal(): RuleClause
-  {
-    val pattern = mutableSetOf<Fact>().apply {
-      addAll(events)
-      addAll(retired)
-      addAll(asserted)
+    fun effect(occur: Occur? = null,
+               activation: ActivationFilter = AssertOnly,
+               init: RHS.(Modification<Binding>) -> Unit): RHS {
+        rhs = RHS(occur, activation, init)
+        return rhs
     }
-    return RuleClause(pattern, object : Trigger
-    {
-      override fun fire(solution: Modification<Binding>,
-                        addEffect: (Modification<Fact>) -> Unit)
-      {
-        if (guards.eval(solution))
-        {
-          rhs.init(solution)
 
-          if (solution is Assert)
-          {
-            events.forEach { addEffect(Retire(it.substitute(solution.arg))) }
-            retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
-            rhs.retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
-            rhs.asserted.forEach { addEffect(Assert(it.substitute(solution.arg))) }
-          }
-        } else if (solution is Assert)
-        {
-          events.forEach { addEffect(Retire(it.substitute(solution.arg))) }
+    fun guard(vararg g: Guard) = guard(And, *g)
+
+    fun guard(j: Junction, vararg g: Guard) =
+            guards.juncts.add(MultiJunction(j, *g))
+
+    fun guard(l: (Modification<Binding>) -> Boolean) {
+        guards.juncts.add(Guard.LambdaGuard(l))
+    }
+
+    fun onceBy(vararg facets:Facet<*>) {
+        guard(Guard.OnceBy(group, *facets))
+    }
+
+    fun toInternal(): RuleClause {
+        val pattern = mutableSetOf<Fact>().apply {
+            addAll(retired)
+            addAll(asserted)
         }
-      }
-    }, group, priority)
-  }
+        return RuleClause(pattern, object : Trigger {
+            override fun fire(cache: MutableMap<Any,Any>,
+                              solution: Modification<Binding>,
+                              addEffect: (Modification<Fact>) -> Unit) {
+                if (guards.eval(cache, solution)) {
+                    rhs.init(solution)
+
+                    if (solution is Assert) {
+                        retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
+                        rhs.retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
+                        rhs.asserted.forEach { addEffect(Assert(it.substitute(solution.arg))) }
+                    }
+                }
+            }
+        }, group, priority)
+    }
 }
+

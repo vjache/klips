@@ -27,6 +27,7 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
         val effectsQueue = LinkedList<Modification<out Fact>>()
 
         override fun flush(vararg expect:String) : ReteInput {
+            val cache = mutableMapOf<Any, Any>()
             val triggered = mutableSetOf<String>()
             var iterCnt = 1
             // While there are effects do ...
@@ -45,7 +46,7 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
                     // 2.1. Take first activation
                     val (sol, ruleClause) = agenda.remove()
                     // 2.2. Fire trigger! Do side effects and enqueue working memory modifications.
-                    ruleClause.trigger.fire(sol) { mdf ->
+                    ruleClause.trigger.fire(cache, sol) { mdf ->
                         effectsQueue.add(mdf)
                     }
 

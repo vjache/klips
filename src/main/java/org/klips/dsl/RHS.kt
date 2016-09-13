@@ -5,7 +5,7 @@ import org.klips.engine.Binding
 import org.klips.engine.Modification
 
 
-class RHS(private val filter : ActivationFilter?, private val initBlock: RHS.(Modification<Binding>) -> Unit) : AsserterTrait() {
+class RHS(private val occur: Occur?, private val filter : ActivationFilter?, private val initBlock: RHS.(Modification<Binding>) -> Unit) : AsserterTrait() {
 
     fun init(solution: Modification<Binding>) {
         asserted.clear()

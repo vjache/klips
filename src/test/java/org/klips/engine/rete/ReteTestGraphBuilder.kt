@@ -38,7 +38,7 @@ class ReteTestGraphBuilder {
     }
 
     val stdTrigger = object : Trigger {
-        override fun fire(solution: Modification<Binding>, addEffect: (Modification<Fact>) -> Unit) {
+        override fun fire(cache: MutableMap<Any, Any>,solution: Modification<Binding>, addEffect: (Modification<Fact>) -> Unit) {
             println(solution)
         }
 
