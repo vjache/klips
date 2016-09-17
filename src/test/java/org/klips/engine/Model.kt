@@ -88,6 +88,11 @@ class At(val aid: Facet<ActorId> = ref(), val cid: Facet<CellId> = ref()) : Fact
     this(ConstFacet(ActorId(aid)), ConstFacet(CellId(cid)))
 }
 
+class CommField(val aid: Facet<ActorId> = ref(), val cid: Facet<CellId> = ref()) : Fact() {
+    constructor(aid: Int, cid: Int) :
+    this(ConstFacet(ActorId(aid)), ConstFacet(CellId(cid)))
+}
+
 class Land(val cid: Facet<CellId> = ref(), val type: Facet<LandKind> = ref()) : Fact() {
     constructor(cid: Int, type: LandKind) :
     this(ConstFacet(CellId(cid)), ConstFacet(type))

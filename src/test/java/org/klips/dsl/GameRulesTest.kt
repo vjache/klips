@@ -145,4 +145,46 @@ class GameRulesTest {
             throw e
         }
     }
+
+    @Test
+    fun commFieldOnMarche() {
+        val gameRules = GameRules()
+        try {
+            gameRules.input.flush("Comm.Field.OnMarche") {
+                +Actor(100, 1000, ActorKind.Comm, 10f, 100f, OnMarch)
+                +At(100,1)
+                +Adjacent(1, 2)
+                +Adjacent(1, 3)
+                +Adjacent(1, 4)
+                +Adjacent(1, 5)
+                +Adjacent(1, 6)
+                +Adjacent(1, 7)
+            }
+            gameRules.rete!!.printSummary()
+        } catch (e: Exception) {
+            gameRules.rete!!.printSummary()
+            throw e
+        }
+    }
+
+    @Test
+    fun commFieldDeployed() {
+        val gameRules = GameRules()
+        try {
+            gameRules.input.flush("Comm.Field.Deployed") {
+                +Actor(100, 1000, ActorKind.Comm, 10f, 100f, Deployed)
+                +At(100,1)
+                +Adjacent(1, 2)
+                +Adjacent(2, 3)
+                +Adjacent(1, 4)
+                +Adjacent(4, 5)
+                +Adjacent(1, 6)
+                +Adjacent(6, 7)
+            }
+            gameRules.rete!!.printSummary()
+        } catch (e: Exception) {
+            gameRules.rete!!.printSummary()
+            throw e
+        }
+    }
 }

@@ -4,6 +4,7 @@ import org.klips.engine.*
 import org.klips.engine.ActorKind.Guard
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
+import java.lang.Math.*
 
 class GameRules : RuleSet() {
 
@@ -14,6 +15,7 @@ class GameRules : RuleSet() {
 
     val cid = ref<CellId>("cid")
     val cid1 = ref<CellId>("cid1")
+    val cid2 = ref<CellId>("cid2")
     val aid = ref<ActorId>("aid")
     val aid1 = ref<ActorId>("aid1")
     val kind = ref<ActorKind>("kind")
@@ -160,6 +162,48 @@ class GameRules : RuleSet() {
             }
         }
 
+        rule(name = "Comm.Field.OnMarche") {
+            +Actor(aid = aid, type = ActorKind.Comm.facet, state = State.OnMarch.facet)
+            +At(aid = aid, cid = cid)
+            +Adjacent(cid1 = cid, cid2 = cid1)
+            effect {
+                +CommField(aid, cid1)
+            }
+        }
 
+        rule(name = "Comm.Field.Deployed") {
+            +Actor(aid = aid, type = ActorKind.Comm.facet, state = State.Deployed.facet)
+            +At(aid = aid, cid = cid)
+            +Adjacent(cid1 = cid, cid2 = cid1)
+            +Adjacent(cid1 = cid1, cid2 = cid2)
+
+            guard(cid ne cid2)
+
+            effect {
+                +CommField(aid, cid2)
+            }
+        }
+
+        rule(name = "Guards.Health.Interchange") {
+            +Turn(pid = pid)
+            val a  = -Actor(pid = pid, aid = aid,  health = hlth,  type = ActorKind.Guard.facet, state = State.Deployed.facet)
+            val a1 = -Actor(pid = pid, aid = aid1, health = hlth1, type = ActorKind.Guard.facet, state = State.Deployed.facet)
+            +At(aid = aid, cid = cid)
+            +At(aid = aid1, cid = cid1)
+            +Adjacent(cid1 = cid, cid2 = cid1)
+
+            onceBy(aid, aid1)
+
+            effect { sol ->
+                val h  = sol[hlth].value
+                val h1 = sol[hlth1].value
+
+                val dh  = (h - h1)/2
+                val dha = abs(dh)
+
+                a.substitute(hlth to (sol[hlth].inc(-copySign(min(5f, dha), dh))).facet)
+                a1.substitute(hlth1 to (sol[hlth1].inc(copySign(min(5f, dha), dh))).facet)
+            }
+        }
     }
 }
