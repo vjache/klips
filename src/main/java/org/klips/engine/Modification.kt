@@ -24,8 +24,9 @@ sealed class Modification<T> (val arg:T) {
         if (other !is Modification<*>)
             return false
 
-        if(this.javaClass != other.javaClass)
-            return false
+        val b1 = this is Assert
+        val b2 = other is Assert<*>
+        if (b1 != b2) return false
 
         return this.arg!!.equals(other.arg)
     }

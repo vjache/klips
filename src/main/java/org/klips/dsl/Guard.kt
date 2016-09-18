@@ -13,7 +13,7 @@ sealed class Guard
 
     class OnceBy(val group: String, vararg val facets: Facet<*>) : Guard() {
         override fun eval(cache: MutableMap<Any, Any>, env: Modification<Binding>): Boolean {
-            val identity = Pair(group, facets.map{ env.arg[it] })
+            val identity = Pair(group, env.inherit(facets.map{ env.arg[it] }))
 
             if(cache[identity] != null)
                 return false
