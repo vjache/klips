@@ -30,4 +30,8 @@ open class RuleSet(val log: Log) : FacetBuilder() {
         rules.add(lhs)
         rete = null
     }
+
+    fun printSummary() {
+        rete!!.printSummary()
+    }
 }

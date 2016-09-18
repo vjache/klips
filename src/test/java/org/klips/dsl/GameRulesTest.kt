@@ -200,9 +200,9 @@ class GameRulesTest {
                 +At(101,2)
                 +Adjacent(1, 2)
             }
-            gameRules.rete!!.printSummary()
+            gameRules.printSummary()
         } catch (e: Exception) {
-            gameRules.rete!!.printSummary()
+            gameRules.printSummary()
             throw e
         }
     }
