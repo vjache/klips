@@ -8,6 +8,7 @@ import org.klips.engine.rete.builder.StrategyOneMem
 import org.klips.engine.rete.builder.Trigger
 import org.jgrapht.DirectedGraph
 import org.jgrapht.graph.SimpleDirectedGraph
+import org.klips.engine.util.Log
 
 
 class ReteTestGraphBuilder {

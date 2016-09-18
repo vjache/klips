@@ -3,8 +3,9 @@ package org.klips.dsl
 import org.klips.engine.rete.ReteInput
 import org.klips.engine.rete.builder.ReteBuilderStrategy
 import org.klips.engine.rete.builder.StrategyOneMem
+import org.klips.engine.util.Log
 
-open class RuleSet : FacetBuilder() {
+open class RuleSet(val log: Log) : FacetBuilder() {
 
     private val rules: MutableList<Rule> = mutableListOf()
 
@@ -12,7 +13,7 @@ open class RuleSet : FacetBuilder() {
     get() {
         if (field == null)
         {
-            field = StrategyOneMem(rules.map { it.toInternal() })
+            field = StrategyOneMem(log, rules.map { it.toInternal() })
         }
         return field
     }

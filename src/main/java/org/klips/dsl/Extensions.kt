@@ -3,10 +3,11 @@ package org.klips.dsl
 import org.klips.dsl.Facet.FacetRef
 import org.klips.engine.Binding
 import org.klips.engine.Modification
+import org.klips.engine.util.Log
 import java.util.concurrent.atomic.AtomicInteger
 
-fun rules(init: RuleSet.() -> Unit): RuleSet {
-    val rs = RuleSet()
+fun rules(log: Log, init: RuleSet.() -> Unit): RuleSet {
+    val rs = RuleSet(log)
     rs.init()
     return rs
 }

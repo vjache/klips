@@ -4,6 +4,8 @@ import org.klips.dsl.Facet.FacetRef
 import org.klips.dsl.Fact
 import org.klips.engine.Modification
 import org.klips.engine.PatternMatcher
+import org.klips.engine.util.activationFailed
+import org.klips.engine.util.activationHappen
 
 
 abstract class AlphaNode(val pattern: Fact) : Node() {

@@ -5,8 +5,9 @@ import org.klips.engine.Modification
 import org.klips.engine.Modification.Assert
 import org.klips.engine.Modification.Retire
 import org.klips.engine.rete.AlphaNode
+import org.klips.engine.util.Log
 
-class MemAlphaNode(pattern:Fact) : AlphaNode(pattern) {
+class MemAlphaNode(val log: Log, pattern:Fact) : AlphaNode(pattern) {
     private val set = mutableSetOf<Fact>()
     override fun modifyCache(mdf: Modification<out Fact>): Boolean {
         val fact = mdf.arg

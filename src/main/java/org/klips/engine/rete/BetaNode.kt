@@ -1,16 +1,18 @@
 package org.klips.engine.rete
 
 import org.klips.dsl.Facet.FacetRef
-import org.klips.dsl.Fact
 import org.klips.dsl.substitute
 import org.klips.engine.Binding
 import org.klips.engine.Modification
 import org.klips.engine.ProjectBinding
 import org.klips.engine.query.BindingSet
-import org.klips.engine.rete.builder.ReteBuilderStrategy
+import org.klips.engine.util.Log
+import org.klips.engine.util.activationFailed
+import org.klips.engine.util.activationHappen
+import org.klips.engine.util.collectPattern
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class BetaNode(left: Node, right: Node) : Node(), Consumer {
+abstract class BetaNode(val log: Log, left: Node, right: Node) : Node(), Consumer {
 
     override val refs: Set<FacetRef<*>> = left.refs.union(right.refs)
 
@@ -71,57 +73,23 @@ abstract class BetaNode(left: Node, right: Node) : Node(), Consumer {
             dbg.cnt.andIncrement
             val patt1 = collectPattern(source)
             val patt2 = collectPattern(other(source))
-            val hcs = "[${hashCode()}:${left.hashCode()},${right.hashCode()}()]";
+            val hcs = "[${hashCode()}:${left.hashCode()},${right.hashCode()}()]"
             if (lookupResults.size == 0)
             {
                 activationFailed()
-                println("JOIN FAIL(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t$patt2")
+                log.reteEvent {
+                    "JOIN FAIL(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t$patt2"
+                }
             }
             val lookupResultsCopy = lookupResults.map { it }
             lookupResultsCopy.forEach {
                 activationHappen()
-                println("JOIN HAPPEN(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t${patt2.substitute(it)}")
+                log.reteEvent {
+                    "JOIN HAPPEN(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t${patt2.substitute(it)}"
+                }
                 notifyConsumers(mdf.inherit(composeBinding(source, binding, it)))
             }
         }
-    }
-
-
-    fun replace(with: Node, which: Node, binding: Binding) {
-        // 1. create proxy node ProxyNode
-        val pnode = ProxyNode(with, binding)
-        // 2. attach proxy node to 'with'
-        val consumersRemove = mutableListOf<Consumer>()
-        which.consumers.forEach { consumer ->
-            when (consumer) {
-                is BetaNode -> {
-                    // ASSERT
-                    if (consumer.left != which && consumer.right != which)
-                        throw IllegalArgumentException()
-
-                    if (consumer.left == which) {
-                        consumer.left = pnode
-                        consumersRemove.add(consumer)
-                    }
-
-                    if (consumer.right == which) {
-                        consumer.right = pnode
-                        consumersRemove.add(consumer)
-                    }
-                }
-                is ProxyNode -> {
-                    if (consumer.node == which) {
-                        consumer.node = pnode
-                        consumersRemove.add(consumer)
-                    }
-                }
-                else ->
-                    throw IllegalArgumentException()
-            }
-        }
-
-        // Clean consumers
-        consumersRemove.forEach { which.removeConsumer(it) }
     }
 
     private fun makeKey(binding: Binding) = ProjectBinding(commonRefs, binding)

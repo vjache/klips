@@ -3,8 +3,9 @@ package org.klips.dsl
 import org.klips.engine.*
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
+import org.klips.engine.util.Log
 
-class TapRules : RuleSet() {
+class TapRules : RuleSet(Log(workingMemory = true, agenda = true, rete = true)) {
 
     var onMove = false
     var onAttack = false

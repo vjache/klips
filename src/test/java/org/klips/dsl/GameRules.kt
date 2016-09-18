@@ -4,13 +4,10 @@ import org.klips.engine.*
 import org.klips.engine.ActorKind.Guard
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
+import org.klips.engine.util.Log
 import java.lang.Math.*
 
-class GameRules : RuleSet() {
-
-    var onMove = false
-    var onAttack = false
-    var onDeploy = false
+class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
 
 
     val cid = ref<CellId>("cid")
@@ -193,6 +190,7 @@ class GameRules : RuleSet() {
             +Adjacent(cid1 = cid, cid2 = cid1)
 
             onceBy(aid, aid1)
+            onceBy(aid1, aid)
 
             effect { sol ->
                 val h  = sol[hlth].value
@@ -201,8 +199,8 @@ class GameRules : RuleSet() {
                 val dh  = (h - h1)/2
                 val dha = abs(dh)
 
-                a.substitute(hlth to (sol[hlth].inc(-copySign(min(5f, dha), dh))).facet)
-                a1.substitute(hlth1 to (sol[hlth1].inc(copySign(min(5f, dha), dh))).facet)
+                +a.substitute(hlth to (sol[hlth].inc(-copySign(min(5f, dha), dh))).facet)
+                +a1.substitute(hlth1 to (sol[hlth1].inc(copySign(min(5f, dha), dh))).facet)
             }
         }
     }

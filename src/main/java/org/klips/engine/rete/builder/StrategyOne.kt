@@ -12,10 +12,11 @@ import org.jgrapht.WeightedGraph
 import org.klips.engine.Modification.Assert
 import org.klips.engine.Modification.Retire
 import org.klips.engine.rete.ReteInput.NotTriggeredException
+import org.klips.engine.util.Log
 import java.util.*
 
 @Suppress("UNCHECKED_CAST")
-abstract class StrategyOne(patterns: List<RuleClause>) :
+abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         ReteBuilderStrategy(patterns) {
 
     val agenda = PriorityQueue<Pair<Modification<Binding>, RuleClause>> { x, y ->
@@ -32,12 +33,12 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
             var iterCnt = 1
             // While there are effects do ...
             while (effectsQueue.isNotEmpty() || agenda.isNotEmpty()) {
-                log("--- ${iterCnt++} ---")
+                log.wmEvent { "--- ${iterCnt++} ---" }
                 // 1. Apply effects to appropriate a-nodes
                 while (!effectsQueue.isEmpty()) {
                     val mdf = effectsQueue.remove()
                     // TODO: Elaborate faster a-node selection
-                    log(mdf)
+                    log.wmEvent { "${if (mdf is Assert) "+" else "-"} ${mdf.arg}" }
                     alphaLayer.forEach { it.accept(mdf) }
                 }
 
@@ -62,7 +63,7 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
                     throw NotTriggeredException(notTriggered)
             }
 
-            log("--- finish ---")
+            log.wmEvent { "--- finish ---" }
             return this
         }
 
@@ -136,18 +137,19 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
                     when (mdf) {
                     // Rule clause activated -- place it to agenda
                         is Assert -> {
-                            agenda.add( log(entry, "+A [$group]") )
+                            log.agEvent { "+A [$group] $entry" }
+                            agenda.add(entry)
                         }
                     // Rule clause deactivated -- remove it from agenda
                         is Retire -> {
                             val antiEntry = Pair(mdf.inverse(), unifiedPatterns.second[i])
                             if (!agenda.remove( antiEntry ))
                             {
-                                log(entry, "+A [$group]")
+                                log.agEvent { "+A [$group] $entry" }
                                 agenda.add(entry)
                             }
                             else
-                                log(antiEntry, "-A [$group]")
+                                log.agEvent { "-A [$group] $antiEntry" }
                         }
                     }
                 }
@@ -213,19 +215,4 @@ abstract class StrategyOne(patterns: List<RuleClause>) :
 
     abstract protected fun createBetaNode(f1: Node, f2: Node): BetaNode
     abstract protected fun createAlphaNode(f1: Fact): AlphaNode
-
-    private fun <T> log(obj: T, pfx:String = "", mid:String = ""): T {
-        when (obj) {
-            is Assert<*> -> {
-                println("$pfx+$mid ${obj.arg}")
-            }
-            is Retire<*> -> {
-                println("$pfx-$mid ${obj.arg}")
-            }
-            else -> {
-                println("$pfx$obj")
-            }
-        }
-        return obj
-    }
 }

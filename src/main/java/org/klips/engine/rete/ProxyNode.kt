@@ -4,6 +4,7 @@ import org.klips.dsl.Facet
 import org.klips.dsl.Facet.FacetRef
 import org.klips.engine.Binding
 import org.klips.engine.Modification
+import org.klips.engine.util.activationHappen
 import kotlin.collections.Map.Entry
 
 

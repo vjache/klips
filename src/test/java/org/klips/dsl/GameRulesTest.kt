@@ -187,4 +187,23 @@ class GameRulesTest {
             throw e
         }
     }
+
+    @Test
+    fun guardHealthInterchange() {
+        val gameRules = GameRules()
+        try {
+            gameRules.input.flush("Guards.Health.Interchange") {
+                +Turn(PlayerId(1000).facet)
+                +Actor(100, 1000, ActorKind.Guard, 10f, 20f, Deployed)
+                +Actor(101, 1000, ActorKind.Guard, 10f, 100f, Deployed)
+                +At(100,1)
+                +At(101,2)
+                +Adjacent(1, 2)
+            }
+            gameRules.rete!!.printSummary()
+        } catch (e: Exception) {
+            gameRules.rete!!.printSummary()
+            throw e
+        }
+    }
 }

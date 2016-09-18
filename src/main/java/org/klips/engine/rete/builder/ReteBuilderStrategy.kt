@@ -8,7 +8,7 @@ import org.klips.engine.query.JoinBindingSet.JoinType.FullOuter
 import org.klips.engine.rete.AlphaNode
 import org.klips.engine.rete.Node
 import org.klips.engine.rete.ReteInput
-import org.klips.engine.rete.printTree
+import org.klips.engine.util.printTree
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 

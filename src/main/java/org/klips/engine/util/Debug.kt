@@ -1,14 +1,18 @@
-package org.klips.engine.rete
+package org.klips.engine.util
 
 import org.klips.dsl.Fact
 import org.klips.dsl.substitute
+import org.klips.engine.rete.AlphaNode
+import org.klips.engine.rete.BetaNode
+import org.klips.engine.rete.Node
+import org.klips.engine.rete.ProxyNode
 import org.klips.engine.rete.builder.ReteBuilderStrategy
 import java.util.concurrent.atomic.AtomicInteger
 
 
 fun Node.printTree(tab:String = "") {
-    val happen = ReteBuilderStrategy.nodeActivity[this]?.first  ?: 0
-    val failed = ReteBuilderStrategy.nodeActivity[this]?.second ?: 0
+    val happen = ReteBuilderStrategy[this]?.first  ?: 0
+    val failed = ReteBuilderStrategy[this]?.second ?: 0
     val counters = "($happen|$failed)"
     when (this) {
         is BetaNode -> {
@@ -29,25 +33,26 @@ fun Node.printTree(tab:String = "") {
 
 }
 
-fun collectPattern(n:Node):List<Fact> {
+fun collectPattern(n: Node):List<Fact> {
     return when (n) {
         is AlphaNode -> listOf(n.pattern)
-        is BetaNode  -> {
+        is BetaNode -> {
             collectPattern(n.left).plus(collectPattern(n.right))
         }
-        is ProxyNode -> {collectPattern(n.node).substitute(n.renamingBinding)}
+        is ProxyNode -> {
+            collectPattern(n.node).substitute(n.renamingBinding)}
         else -> throw IllegalArgumentException("Unexpected node type: ${n.javaClass}")
     }
 }
 
 fun Node.activationHappen() {
-    ReteBuilderStrategy.nodeActivity.getOrPut(this){
+    org.klips.engine.rete.builder.ReteBuilderStrategy.getOrPut(this){
         Pair(AtomicInteger(0), AtomicInteger(0))
     }.first.incrementAndGet()
 }
 
 fun Node.activationFailed() {
-    ReteBuilderStrategy.nodeActivity.getOrPut(this){
+    org.klips.engine.rete.builder.ReteBuilderStrategy.getOrPut(this){
         Pair(AtomicInteger(0), AtomicInteger(0))
     }.second.incrementAndGet()
 }

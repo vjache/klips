@@ -9,8 +9,9 @@ import org.klips.engine.query.BindingSet
 import org.klips.engine.query.SimpleBindingSet
 import org.klips.engine.rete.BetaNode
 import org.klips.engine.rete.Node
+import org.klips.engine.util.Log
 
-class MemBetaNode(l: Node, r: Node) : BetaNode(l, r) {
+class MemBetaNode(log: Log, l: Node, r: Node) : BetaNode(log, l, r) {
 
     private val leftIndex = mutableMapOf<Binding, MutableSet<Binding>>()
     private val rightIndex = mutableMapOf<Binding, MutableSet<Binding>>()
