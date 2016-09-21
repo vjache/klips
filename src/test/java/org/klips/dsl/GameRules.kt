@@ -126,6 +126,7 @@ class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
             }
         }
 
+
         rule(name = "Scrap") {
             -ScrapCommand(aid, aid1)
             +At(aid, cid)
@@ -201,6 +202,14 @@ class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
 
                 +a.substitute(hlth to (sol[hlth].inc(-copySign(min(5f, dha), dh))).facet)
                 +a1.substitute(hlth1 to (sol[hlth1].inc(copySign(min(5f, dha), dh))).facet)
+            }
+        }
+
+        rule(name = "RefNotBound.Exception") {
+            +Actor(aid = ActorId(171717).facet)
+
+            effect { sol ->
+                sol[pid]
             }
         }
     }

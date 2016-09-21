@@ -2,6 +2,8 @@ package org.klips.engine
 
 import org.klips.dsl.Facet
 import org.klips.dsl.Facet.ConstFacet
+import org.klips.FacetNotBoundException
+import org.klips.ReferenceNotBoundException
 
 abstract class  Binding : Map<Facet<*>, Facet<*>>{
     val refs: Set<Facet<*>>
@@ -16,8 +18,17 @@ abstract class  Binding : Map<Facet<*>, Facet<*>>{
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <V : Facet<*>> fetch(key: Facet<*>): V{
-        return this[key] as V
+    fun <V : Facet<*>> fetch(key: Facet<*>): V {
+        this[key]?.let {
+            return it as V
+        }
+
+        when (key) {
+            is Facet.FacetRef ->
+                throw ReferenceNotBoundException(key, this)
+            else ->
+                throw FacetNotBoundException(key, this)
+        }
     }
 
     fun <V : Comparable<V>> fetchValue(key: Facet<*>): V {

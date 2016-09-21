@@ -11,7 +11,7 @@ import org.jgrapht.EdgeFactory
 import org.jgrapht.WeightedGraph
 import org.klips.engine.Modification.Assert
 import org.klips.engine.Modification.Retire
-import org.klips.engine.rete.ReteInput.NotTriggeredException
+import org.klips.RuleGroupNotTriggeredException
 import org.klips.engine.util.Log
 import java.util.*
 
@@ -60,7 +60,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
                 val notTriggered = expect.filter { it !in triggered }
 
                 if (notTriggered.isNotEmpty())
-                    throw NotTriggeredException(notTriggered)
+                    throw RuleGroupNotTriggeredException(notTriggered)
             }
 
             log.wmEvent { "--- finish ---" }

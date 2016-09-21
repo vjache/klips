@@ -1,10 +1,13 @@
 package org.klips.dsl
 
 import org.junit.Test
+import org.klips.ReferenceNotBoundException
 import org.klips.engine.*
 import org.klips.engine.ActorKind.Aim
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
+import kotlin.test.assertFails
+import kotlin.test.assertFailsWith
 
 /**
  * Created by vj on 08.09.16.
@@ -204,6 +207,16 @@ class GameRulesTest {
         } catch (e: Exception) {
             gameRules.printSummary()
             throw e
+        }
+    }
+
+    @Test
+    fun refNotBound() {
+        assertFailsWith<ReferenceNotBoundException> {
+            val gameRules = GameRules()
+            gameRules.input.flush("RefNotBound.Exception") {
+                +Actor(171717, 1000, ActorKind.Guard, 10f, 20f, Deployed)
+            }
         }
     }
 }
