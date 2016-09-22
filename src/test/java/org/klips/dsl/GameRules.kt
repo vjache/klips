@@ -9,6 +9,8 @@ import java.lang.Math.*
 
 class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
 
+    val triggered = mutableListOf<String>()
+
 
     val cid = ref<CellId>("cid")
     val cid1 = ref<CellId>("cid1")
@@ -126,7 +128,6 @@ class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
             }
         }
 
-
         rule(name = "Scrap") {
             -ScrapCommand(aid, aid1)
             +At(aid, cid)
@@ -212,5 +213,33 @@ class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
                 sol[pid]
             }
         }
+
+        rule(name = "ConcurrencyTest1.Rule1") {
+            -Actor(aid = aid)
+            +MoveCommand(aid, CellId(101010).facet)
+
+            effect { sol ->
+                triggered.add("ConcurrencyTest1.Rule1")
+            }
+        }
+
+        rule(name = "ConcurrencyTest1.Rule2") {
+            -Actor(aid = aid)
+            +AttackCommand(aid, ActorId(121212).facet)
+
+            effect { sol ->
+                triggered.add("ConcurrencyTest1.Rule2")
+            }
+        }
+
+        rule(name = "ConcurrencyTest2.Rule") {
+            -Actor(aid = aid, pid = PlayerId(109109109).facet)
+            +RepairCommand(aid, aid1)
+
+            effect { sol ->
+                triggered.add("ConcurrencyTest2.Rule")
+            }
+        }
+
     }
 }

@@ -6,6 +6,7 @@ import org.klips.engine.*
 import org.klips.engine.ActorKind.Aim
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
+import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 
@@ -218,5 +219,31 @@ class GameRulesTest {
                 +Actor(171717, 1000, ActorKind.Guard, 10f, 20f, Deployed)
             }
         }
+    }
+
+    @Test
+    fun ruleConcurrency() {
+        val g = GameRules()
+        g.input.flush() {
+            +Actor(151515, 1000, ActorKind.Guard, 10f, 20f, Deployed)
+            +MoveCommand(ActorId(151515).facet, CellId(101010).facet)
+            +AttackCommand(ActorId(151515).facet, ActorId(121212).facet)
+        }
+        assertEquals(1, g.triggered.size)
+    }
+
+    @Test
+    fun ruleConcurrency2() {
+        val g = GameRules()
+        g.input.flush() {
+            +Actor(161616, 109109109, ActorKind.Guard, 10f, 20f, Deployed)
+            +RepairCommand(ActorId(161616).facet, ActorId(161617).facet)
+            +RepairCommand(ActorId(161616).facet, ActorId(161618).facet)
+            +RepairCommand(ActorId(161616).facet, ActorId(161619).facet)
+            +RepairCommand(ActorId(161616).facet, ActorId(161620).facet)
+            +RepairCommand(ActorId(161616).facet, ActorId(161621).facet)
+            +RepairCommand(ActorId(161616).facet, ActorId(161622).facet)
+        }
+        assertEquals(1, g.triggered.size)
     }
 }
