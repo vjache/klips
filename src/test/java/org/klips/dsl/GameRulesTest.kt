@@ -7,13 +7,25 @@ import org.klips.engine.ActorKind.Aim
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 /**
  * Created by vj on 08.09.16.
  */
 class GameRulesTest {
+
+    @Test
+    fun createCommand() {
+        GameRules().input.flush("CreateAgent") {
+            +Adjacent(2, 1)
+            +At(100, 1)
+            +Actor(100, 1000, Aim, 100f, 100f, Deployed)
+            +CreateAgentCommand(ActorId(100), CellId(2), ActorKind.Comm)
+        }
+        assertNotNull(ActorId.last)
+    }
+
     @Test
     fun moveCommand() {
         GameRules().input.flush("Move") {
@@ -21,6 +33,7 @@ class GameRulesTest {
             +At(100, 1)
             +Actor(100, 1000, Aim, 7f, 100f, OnMarch)
             +MoveCommand(ActorId(100).facet, CellId(2).facet)
+            +CommField(ActorId(111).facet, CellId(2).facet)
         }
     }
 

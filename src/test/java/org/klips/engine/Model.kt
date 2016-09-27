@@ -8,6 +8,7 @@ import org.klips.dsl.Facet.IntFacet
 import org.klips.dsl.Fact
 import org.klips.dsl.facet
 import org.klips.dsl.ref
+import java.util.concurrent.atomic.AtomicInteger
 
 /////////////////////////////////////////////////////////////////////////////////
 data class CellId(val id: Int) : Comparable<CellId> {
@@ -15,6 +16,13 @@ data class CellId(val id: Int) : Comparable<CellId> {
 }
 
 data class ActorId(val id: Int) : Comparable<ActorId> {
+    companion object {
+        val clock = AtomicInteger()
+        var last : ActorId? = null
+    }
+    constructor() : this(clock.andIncrement) {
+        last = this
+    }
     override fun compareTo(other: ActorId): Int = id.compareTo(other.id)
 }
 
@@ -114,9 +122,14 @@ class Actor(val aid:    Facet<ActorId> = ref(),
             val health: Facet<Level> = ref(),
             val state:  Facet<State> = ref()) : Fact() {
 
-
     constructor(id: Int, pid: Int, type: ActorKind) :
     this(id, pid, type, 100f, 100f, State.OnMarch)
+
+    constructor(aid: ActorId, pid: PlayerId, type: ActorKind) :
+    this(aid.facet, pid.facet, type.facet, Level(100f).facet, Level(100f).facet, State.OnMarch.facet)
+
+    constructor(aid: ActorId, pid: PlayerId, type: ActorKind, state:State) :
+    this(aid.facet, pid.facet, type.facet, Level(100f).facet, Level(100f).facet, state.facet)
 
     constructor(id: Int, pid: Int, type: ActorKind, energy: Float, health: Float, state: State) :
     this(ConstFacet(ActorId(id)),
@@ -178,7 +191,9 @@ class CreateAgentCommand(
         actingAgent : Facet<ActorId> = ref(),
         val cellId    : Facet<CellId>  = ref(),
         val agentType : Facet<ActorKind>   = ref()) :
-        UnaryCommand( actingAgent )
+        UnaryCommand( actingAgent ){
+    constructor(aid:ActorId, cid:CellId, type:ActorKind):this(aid.facet, cid.facet, type.facet)
+}
 
 class DeployCommand(
         actingAgent : Facet<ActorId> = ref()) :

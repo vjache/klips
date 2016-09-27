@@ -1,13 +1,17 @@
 package org.klips.dsl
 
+import org.klips.dsl.ActivationFilter.Both
 import org.klips.engine.*
+import org.klips.engine.ActorKind.Aim
 import org.klips.engine.ActorKind.Guard
+import org.klips.engine.Modification.Assert
+import org.klips.engine.Modification.Retire
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
 import org.klips.engine.util.Log
 import java.lang.Math.*
 
-class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
+class GameRules : RuleSet(Log()) {
 
     val triggered = mutableListOf<String>()
 
@@ -38,15 +42,30 @@ class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
             }
         }
 
+        rule(name = "CreateAgent") { // On Move
+            -CreateAgentCommand(aid, cid1, kind)
+            +Actor(aid = aid, type = Aim.facet, state = Deployed.facet, pid = pid)
+            +At(aid, cid)
+            +Adjacent(cid, cid1)
+
+            effect { sol ->
+                val newAid = ActorId()
+                +Actor(newAid, sol[pid], sol[kind])
+                +At(newAid.facet, cid1)
+            }
+        }
+
         rule(name = "Move") { // On Move
 
             -MoveCommand(aid, cid1)
-            -UnaryCommand(aid)
+            val cf = +CommField(aid1,cid1)
             -At(aid, cid)
             +Adjacent(cid, cid1)
-            val a = -Actor(aid = aid, energy = nrgy)
+            val a = -Actor(aid = aid, energy = nrgy, state = OnMarch.facet)
 
-            guard { it[nrgy].value > 3 }
+            guard {
+                it[nrgy].value > 3
+            }
 
             effect { sol ->
                 val v = sol[nrgy].inc(-3f).facet
@@ -165,8 +184,12 @@ class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
             +Actor(aid = aid, type = ActorKind.Comm.facet, state = State.OnMarch.facet)
             +At(aid = aid, cid = cid)
             +Adjacent(cid1 = cid, cid2 = cid1)
-            effect {
-                +CommField(aid, cid1)
+            effect(activation = Both) { sol ->
+                when (sol)
+                {
+                    is Assert -> +CommField(aid, cid1)
+                    is Retire -> -CommField(aid, cid1)
+                }
             }
         }
 
@@ -178,8 +201,18 @@ class GameRules : RuleSet(Log(workingMemory = true, agenda = true)) {
 
             guard(cid ne cid2)
 
-            effect {
-                +CommField(aid, cid2)
+            effect(activation = Both) { sol ->
+                when (sol)
+                {
+                    is Assert -> {
+                        +CommField(aid, cid2)
+                        +CommField(aid, cid1)
+                    }
+                    is Retire -> {
+                        -CommField(aid, cid2)
+                        -CommField(aid, cid1)
+                    }
+                }
             }
         }
 
