@@ -1,27 +1,33 @@
 package org.klips.dsl
 
+import org.klips.dsl.ActivationFilter.AssertOnly
 import org.klips.dsl.Guard.Junction
 import org.klips.dsl.Guard.Junction.And
 import org.klips.dsl.Guard.MultiJunction
 import org.klips.engine.Binding
-import org.klips.dsl.ActivationFilter
 import org.klips.engine.Modification
 import org.klips.engine.Modification.Assert
 import org.klips.engine.Modification.Retire
-import org.klips.dsl.ActivationFilter.AssertOnly
 import org.klips.engine.rete.builder.RuleClause
 import org.klips.engine.rete.builder.Trigger
 import kotlin.properties.Delegates.notNull
 
-class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter by AsserterTrait() {
+class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter by AsserterTrait({}) {
 
     private val guards = MultiJunction(And)
     private var rhs by notNull<RHS>()
 
+    val refs: Set<Facet.FacetRef<*>> by lazy {
+        mutableSetOf<Facet.FacetRef<*>>().apply {
+            asserted.forEach { fact -> addAll(fact.refs) }
+            retired.forEach { fact -> addAll(fact.refs) }
+        }
+    }
+
     fun effect(occur: Occur? = null,
                activation: ActivationFilter = AssertOnly,
                init: RHS.(Modification<Binding>) -> Unit): RHS {
-        rhs = RHS(occur, activation, init)
+        rhs = RHS(this, occur, activation, init)
         return rhs
     }
 

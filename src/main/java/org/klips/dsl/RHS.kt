@@ -1,11 +1,19 @@
 package org.klips.dsl
 
+import org.klips.RHSFactNotBoundException
 import org.klips.dsl.ActivationFilter.*
 import org.klips.engine.Binding
 import org.klips.engine.Modification
 
 
-class RHS(private val occur: Occur?, private val filter : ActivationFilter?, private val initBlock: RHS.(Modification<Binding>) -> Unit) : AsserterTrait() {
+class RHS(private val rule : Rule,
+          private val occur : Occur?,
+          private val filter : ActivationFilter?,
+          private val initBlock: RHS.(Modification<Binding>) -> Unit) :
+        AsserterTrait({fact ->
+            val unboundRef = fact.refs.filter { it !in rule.refs }
+            if(unboundRef.size > 0) throw RHSFactNotBoundException(fact, unboundRef, rule)
+        }) {
 
     fun init(solution: Modification<Binding>) {
         asserted.clear()
