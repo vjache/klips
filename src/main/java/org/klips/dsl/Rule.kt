@@ -50,11 +50,9 @@ class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter b
                 if (guards.eval(cache, solution)) {
                     rhs.init(solution)
 
-                    if (solution is Assert) {
-                        retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
-                        rhs.retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
-                        rhs.asserted.forEach { addEffect(Assert(it.substitute(solution.arg))) }
-                    }
+                    retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
+                    rhs.retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
+                    rhs.asserted.forEach { addEffect(Assert(it.substitute(solution.arg))) }
                 }
             }
         }, group, priority)
