@@ -1,5 +1,6 @@
 package org.klips.dsl
 
+import org.klips.PatternNotConnectedException
 import org.klips.dsl.ActivationFilter.Both
 import org.klips.engine.*
 import org.klips.engine.ActorKind.Aim
@@ -10,6 +11,7 @@ import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
 import org.klips.engine.util.Log
 import java.lang.Math.*
+import kotlin.test.assertFailsWith
 
 class GameRules : RuleSet(Log()) {
 
@@ -271,6 +273,17 @@ class GameRules : RuleSet(Log()) {
 
             effect { sol ->
                 triggered.add("ConcurrencyTest2.Rule")
+            }
+        }
+
+        assertFailsWith<PatternNotConnectedException> {
+            rule(name = "NotConnected") {
+                -Actor(aid = aid, pid = PlayerId(109109109).facet)
+                +RepairCommand(ref("x"), aid1)
+
+                effect { sol ->
+                    triggered.add("ConcurrencyTest2.Rule")
+                }
             }
         }
 

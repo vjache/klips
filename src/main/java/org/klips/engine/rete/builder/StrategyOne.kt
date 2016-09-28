@@ -73,9 +73,9 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         }
     }
 
-    override val alphaLayer: Set<AlphaNode>
-    override val allNodes: Set<Node>
-    override val roots: List<Pair<RuleClause, Node>>
+    final override val alphaLayer: Set<AlphaNode>
+    final override val allNodes: Set<Node>
+    override final val roots: List<Pair<RuleClause, Node>>
 
     init {
 
@@ -108,16 +108,14 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         } while (!complete)
 
         workGraphsSorted.forEach { workGraph ->
-
             if (!workGraph.edgeSet().isEmpty())
                 throw IllegalStateException("Still have edges: $workGraph")
 
             if (workGraph.vertexSet().size != 1)
-                throw IllegalStateException("Still have edges: $workGraph")
+                throw IllegalStateException("Still have more than one vertices: $workGraph")
         }
 
-        //TODO : Bind remaining rete node with trigger
-        //...
+        // Bind remaining rete node with trigger
 
         val workGraphsByIndex = workGraphs.mapIndexed{ i,w -> Pair(w,i)}.toMap()
         roots = workGraphsSorted.map { workGraph ->

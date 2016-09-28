@@ -1,5 +1,6 @@
 package org.klips.dsl
 
+import org.klips.PatternNotConnectedException
 import org.klips.dsl.ActivationFilter.AssertOnly
 import org.klips.dsl.Guard.Junction
 import org.klips.dsl.Guard.Junction.And
@@ -28,7 +29,24 @@ class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter b
                activation: ActivationFilter = AssertOnly,
                init: RHS.(Modification<Binding>) -> Unit): RHS {
         rhs = RHS(this, occur, activation, init)
+        checkConnectedByRef(asserted.union(retired))
         return rhs
+    }
+
+    private fun checkConnectedByRef(pattern: Set<Fact>) {
+        val first  = pattern.first()
+        val refs   = first.refs
+        val others = pattern.minus(first)
+        val reminder = checkConnectedByRef(refs.toSet(), others)
+        if (reminder.size > 0)
+            throw PatternNotConnectedException(pattern.minus(reminder), reminder)
+    }
+    private fun checkConnectedByRef(refs: Set<Facet<*>>, pattern: Set<Fact>) : Set<Fact> {
+        pattern.find { fact -> fact.refs.intersect(refs).size > 0 }?.let {
+            return checkConnectedByRef(refs.union(it.refs), pattern.minus(it))
+        }
+
+        return pattern
     }
 
     fun guard(vararg g: Guard) = guard(And, *g)
