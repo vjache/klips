@@ -212,5 +212,83 @@ property `facet`. As you can see, to get the Kotlin value
 (i.e. not FacetConst<T> but T) bound to particular reference we use 
 `sol[ref]` call.
 
-### Computation semantics
+Now we need another one rule:
+```kotlin
+// Adjacency symmetry rule
+rule {
+    +Adjacent(cid0, cid)
+    effect {
+        +Adjacent(cid, cid0)    
+    }
+}
+```
+The rule above ensures that if `cid0` adjacent to `cid` than `cid` 
+adjacent to `cid0`. This `adjacency symmetry rule` required for `move rule` 
+successful work. When we initialized our world we have asserted a set of 
+adjacency facts but we did not asserted their reversed counterparts and 
+without the `adjacency symmetry rule` it would lead to a problem of not 
+triggering the `move rule` which could be solved by asserting also a reversed 
+adjacency facts, but it is much better to add a rule generating what we need.
+  
+#### More on 'guard'
 TBD
+
+#### More on 'effect'
+Lazy apply
+TBD
+
+#### Rule priority
+TBD
+
+### Computation semantics
+To prepare a set of rules we must create a subclass of 
+`org.klips.dsl.RuleSet` like that:
+
+```kotlin
+class MyRules : RuleSet() {
+    init {
+        rule {
+            ...
+            effect {
+                ...
+            }
+        }
+        
+        rule {
+            ...
+            effect {
+                ...
+            }
+        }
+        
+        ...
+    }
+}
+```
+After that we are able to start to use our rule system as follow:
+```kotlin
+    val r = MyRules()
+    
+    r.input.flush {
+        +F1(a,b,c)
+        +F2(a,b)
+        ...
+    }
+```
+
+The method `flush` allow us to apply a set of facts to the rule system WM. 
+We should know some high level view about how such an application handled:
+```plain
+1. facts pushed to queue the `qf`
+2. while `qf` is not empty repeat
+     2.1. take a fact from `qf` and apply it to the WM (assert or retire)
+     2.2. some rules may be 
+        2.2.a. activated and pushed into `agenda` along with their solution
+        2.2.b. deactivated and purged from `agenda` along with their solution
+3. if `agenda` is not empty 
+    3.1. take a pair (rule, solution) with highest priority from the `agenda`
+    3.2. compute an effect of a rule using the solution and obtain a set of asserted and retired facts 
+    3.3. push them to the `qf`
+    3.4. go to 2.
+```
+So after flush is returns a multiple rules may be triggered and have applied their effects.
