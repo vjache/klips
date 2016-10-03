@@ -270,7 +270,7 @@ rule {
     }
 }
 ```
-The rule above ensures that if `cid0` adjacent to `cid` than `cid` 
+The rule above ensures that if `cid0` adjacent to `cid` then `cid` 
 adjacent to `cid0`. This `adjacency symmetry rule` required for `move rule` 
 successful work. When we initialized our world we have asserted a set of 
 adjacency facts but we did not asserted their reversed counterparts and 
@@ -330,7 +330,7 @@ rule( priority = 10.5 ) {
     ...
 }
 ```
-The lower value the highest priority. If priority is not specified then 
+The lower value the higher priority. If priority is not specified then 
 it is generated in accordance to the appearance in a rule set, i.e. very 
 first rule in a rule set have highest priority. 
 
@@ -373,7 +373,7 @@ After that we are able to start to use our rule system as follow:
 The method `flush` allow us to apply a set of facts to the rule system WM. 
 We should have some high level view about how such an application handled:
 ```plain
-1. facts pushed to queue the `qf`
+1. facts pushed to the queue `qf`
 2. while `qf` is not empty repeat
      2.1. take a fact from `qf` and apply it to the WM (assert or retire)
      2.2. some rules may be 
