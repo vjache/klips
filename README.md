@@ -231,14 +231,60 @@ triggering the `move rule` which could be solved by asserting also a reversed
 adjacency facts, but it is much better to add a rule generating what we need.
   
 #### More on 'guard'
-TBD
+Guard is a way to impose an additional constraints on possible values 
+denoted by references. For example above have we specified that we are 
+interested only in those solutions where energy (`nrgy`) value is greater 
+than 5:
+```kotlin
+guard(nrgy gt 5.facet)
+```
+the function `guard` takes a boolean expression made by infix operator 
+`gt` (greater than). There are other operators:
+
+- `gt`  - greater than
+- `ge`  - greater or equal
+- `lt`  - less than
+- `le`  - less or equal
+- `eq`  - equal
+- `and` - conjunction
+- `or`  - disjunction
+so the more complex guard could look like:
+```kotlin
+guard( (x gt y) and (z le 5.facet) )
+```
+There is also another way to specify guard:
+```kotlin
+guard { sol -> sol[nrgy] > 0 }
+```
+I.e. pass to `guard` boolean function (predicate) accepting solution 
+`sol`. This approach give us more for complicated cases like:
+```kotlin
+guard { sol -> max(0, sol[nrgy] - sol[nrgy1]) > 0 }
+``` 
 
 #### More on 'effect'
-Lazy apply
-TBD
+The high order function `effect` (RHS) may contain any code e.g. side 
+effect which must be executed if condition met. When rule set is created 
+the rules are 'compiled' into special representation called 'rete'. At 
+the phase of such a 'compilation' the LHS is executed and pattern (facts) 
+obtained, but RHS (i.e. lambda passed to the `effect`) is executed at 
+'runtime' when rule is decided to be applied. In example above we have 
+no any side effects and using effect only to change a WM.
 
 #### Rule priority
-TBD
+In a real world rule sets, it is very probable a situation when we have 
+a several rules activated (in agenda) which have their effects non 
+commutative. That is the order of an application of the effects may be 
+important. For this case we want to give a simple hint to the engine -- 
+priority:
+```kotlin
+rule( priority = 10.5 ) {
+    ...
+}
+```
+The lower value the highest priority. If priority is not specified then 
+it is generated in accordance to the appearance in a rule set, i.e. very 
+first rule in a rule set have highest priority. 
 
 ### Computation semantics
 To prepare a set of rules we must create a subclass of 
@@ -292,4 +338,5 @@ We should have some high level view about how such an application handled:
     3.4. go to 2.
 4. flush is finished.
 ```
-So after flush is returns a multiple rules may be triggered and have applied their effects.
+So after flush is returns a multiple rules may be triggered and have 
+applied their effects.
