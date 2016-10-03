@@ -277,7 +277,7 @@ After that we are able to start to use our rule system as follow:
 ```
 
 The method `flush` allow us to apply a set of facts to the rule system WM. 
-We should know some high level view about how such an application handled:
+We should have some high level view about how such an application handled:
 ```plain
 1. facts pushed to queue the `qf`
 2. while `qf` is not empty repeat
@@ -290,5 +290,6 @@ We should know some high level view about how such an application handled:
     3.2. compute an effect of a rule using the solution and obtain a set of asserted and retired facts 
     3.3. push them to the `qf`
     3.4. go to 2.
+4. flush is finished.
 ```
 So after flush is returns a multiple rules may be triggered and have applied their effects.
