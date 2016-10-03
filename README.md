@@ -2,7 +2,55 @@
 
 ### Keywords
 Rule Engine, Logical Programming, Declarative Programming, Rete, AI Engine, DSL
-  
+
+### Right off the bat!
+```kotlin
+rule(group = "GrandFatherRule") {
+    val p1 = ref<Int>() ; val p2 = ref<Int>() ; val p3 = ref<Int>()
+    +FatherOf(p1, p2)
+    +FatherOf(p2, p3)
+    effect {
+        +GrandFatherOf(p1, p3)
+    }
+}
+
+rule(group = "GrandFatherRule") {
+    val p1 = ref<Int>() ; val p2 = ref<Int>() ; val p3 = ref<Int>()
+    +FatherOf(p1, p2)
+    +MotherOf(p2, p3)
+    effect {
+        +GrandFatherOf(p1, p3)
+    }
+}
+
+rule(group = "SiblingsRule") {
+    val p1 = ref<Int>() ; val p2 = ref<Int>() ; val p3 = ref<Int>()
+    +FatherOf(p1, p2)
+    +FatherOf(p1, p3)
+    effect {
+        +SiblingOf(p1, p3)
+    }
+}
+
+rule(group = "SiblingsRule") {
+    val p1 = ref<Int>() ; val p2 = ref<Int>() ; val p3 = ref<Int>()
+    +MotherOf(p1, p2)
+    +MotherOf(p1, p3)
+    effect {
+        +SiblingOf(p1, p3)
+    }
+}
+
+rule(group = "SiblingsSymmetryRule") {
+    val p1 = ref<Int>() ; val p2 = ref<Int>()
+    +SiblingOf(p1, p2)
+    effect {
+        +SiblingOf(p2, p1)
+    }
+}
+```
+Still interesting? Well, lets dive!
+
 ### Motivation 
 This library is inspired by the CLIPS (C Language Integrated Production 
 System), hence KLIPS does for Kotlin the same thing as CLIPS for C. 
