@@ -28,7 +28,7 @@ rule(group = "SiblingsRule") {
     +FatherOf(p1, p2)
     +FatherOf(p1, p3)
     effect {
-        +SiblingOf(p1, p3)
+        +SiblingOf(p2, p3)
     }
 }
 
@@ -37,7 +37,7 @@ rule(group = "SiblingsRule") {
     +MotherOf(p1, p2)
     +MotherOf(p1, p3)
     effect {
-        +SiblingOf(p1, p3)
+        +SiblingOf(p2, p3)
     }
 }
 
