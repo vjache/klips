@@ -5,48 +5,59 @@ Rule Engine, Logical Programming, Declarative Programming, Rete, AI Engine, DSL
 
 ### Right off the bat!
 ```kotlin
-rule(group = "GrandFatherRule") {
-    val p1 = ref<Int>() ; val p2 = ref<Int>() ; val p3 = ref<Int>()
-    +FatherOf(p1, p2)
-    +FatherOf(p2, p3)
-    effect {
-        +GrandFatherOf(p1, p3)
+class MyRules : RuleSet() {
+    init {
+        rule(group = "GrandFatherRule") {
+            val p1 = ref<String>() ; val p2 = ref<String>() ; val p3 = ref<String>()
+            +FatherOf(p1, p2)
+            +FatherOf(p2, p3)
+            effect {
+                +GrandFatherOf(p1, p3)
+            }
+        }
+        
+        rule(group = "GrandFatherRule") {
+            val p1 = ref<String>() ; val p2 = ref<String>() ; val p3 = ref<String>()
+            +FatherOf(p1, p2)
+            +MotherOf(p2, p3)
+            effect {
+                +GrandFatherOf(p1, p3)
+            }
+        }
+        
+        rule(group = "SiblingsRule") {
+            val p1 = ref<String>() ; val p2 = ref<String>() ; val p3 = ref<String>()
+            +FatherOf(p1, p2)
+            +FatherOf(p1, p3)
+            effect {
+                +SiblingOf(p2, p3)
+            }
+        }
+        
+        rule(group = "SiblingsRule") {
+            val p1 = ref<String>() ; val p2 = ref<String>() ; val p3 = ref<String>()
+            +MotherOf(p1, p2)
+            +MotherOf(p1, p3)
+            effect {
+                +SiblingOf(p2, p3)
+            }
+        }
+        
+        rule(group = "SiblingsSymmetryRule") {
+            val p1 = ref<String>() ; val p2 = ref<String>()
+            +SiblingOf(p1, p2)
+            effect {
+                +SiblingOf(p2, p1)
+            }
+        }
     }
 }
 
-rule(group = "GrandFatherRule") {
-    val p1 = ref<Int>() ; val p2 = ref<Int>() ; val p3 = ref<Int>()
-    +FatherOf(p1, p2)
-    +MotherOf(p2, p3)
-    effect {
-        +GrandFatherOf(p1, p3)
-    }
-}
-
-rule(group = "SiblingsRule") {
-    val p1 = ref<Int>() ; val p2 = ref<Int>() ; val p3 = ref<Int>()
-    +FatherOf(p1, p2)
-    +FatherOf(p1, p3)
-    effect {
-        +SiblingOf(p2, p3)
-    }
-}
-
-rule(group = "SiblingsRule") {
-    val p1 = ref<Int>() ; val p2 = ref<Int>() ; val p3 = ref<Int>()
-    +MotherOf(p1, p2)
-    +MotherOf(p1, p3)
-    effect {
-        +SiblingOf(p2, p3)
-    }
-}
-
-rule(group = "SiblingsSymmetryRule") {
-    val p1 = ref<Int>() ; val p2 = ref<Int>()
-    +SiblingOf(p1, p2)
-    effect {
-        +SiblingOf(p2, p1)
-    }
+val r = MyRules()
+r.input.flush {
+    +FatherOf("p1", "p2")
+    +FatherOf("p2", "p3")
+    +FatherOf("p1", "p22")
 }
 ```
 Still interesting? Well, lets dive!
