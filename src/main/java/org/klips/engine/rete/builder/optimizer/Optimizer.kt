@@ -2,9 +2,10 @@ package org.klips.engine.rete.builder.optimizer
 
 import org.klips.engine.Binding
 import org.klips.engine.rete.*
+import org.klips.engine.util.Log
 
 
-object Optimizer {
+class Optimizer(val log:Log) {
 
     fun optimize(nodes: Set<Node>): Set<Node> {
 
@@ -83,7 +84,7 @@ object Optimizer {
 
     fun replace(with: Node, which: Node, binding: Binding) {
         // 1. create proxy node ProxyNode
-        val pnode = ProxyNode(with, binding)
+        val pnode = ProxyNode(log, with, binding)
         // 2. attach proxy node to 'with'
         val consumersRemove = mutableListOf<Consumer>()
         which.consumers.forEach { consumer ->

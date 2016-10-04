@@ -4,11 +4,12 @@ import org.klips.dsl.Facet
 import org.klips.dsl.Facet.FacetRef
 import org.klips.engine.Binding
 import org.klips.engine.Modification
+import org.klips.engine.util.Log
 import org.klips.engine.util.activationHappen
 import kotlin.collections.Map.Entry
 
 
-class ProxyNode(node: Node, val renamingBinding: Binding) : Node(), Consumer {
+class ProxyNode(log:Log, node: Node, val renamingBinding: Binding) : Node(log), Consumer {
 
     var node: Node = node
     set(value) {
@@ -31,7 +32,10 @@ class ProxyNode(node: Node, val renamingBinding: Binding) : Node(), Consumer {
     }
 
     override fun consume(source: Node, mdf: Modification<Binding>) {
-        activationHappen()
+        log.reteEvent {
+            activationHappen()
+            "P-CONSUME: $mdf, $this"
+        }
         notifyConsumers(mdf.inherit(ProxyBinding(mdf.arg)))
     }
 

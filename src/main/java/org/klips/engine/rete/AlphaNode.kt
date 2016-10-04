@@ -4,11 +4,12 @@ import org.klips.dsl.Facet.FacetRef
 import org.klips.dsl.Fact
 import org.klips.engine.Modification
 import org.klips.engine.PatternMatcher
+import org.klips.engine.util.Log
 import org.klips.engine.util.activationFailed
 import org.klips.engine.util.activationHappen
 
 
-abstract class AlphaNode(val pattern: Fact) : Node() {
+abstract class AlphaNode(log:Log, val pattern: Fact) : Node(log) {
 
     val matcher = PatternMatcher(pattern)
 
@@ -18,16 +19,25 @@ abstract class AlphaNode(val pattern: Fact) : Node() {
     fun accept(mdf:Modification<out Fact>):Boolean {
         matcher.bind(mdf.arg)?.let {
             if(modifyCache(mdf)) {
-                activationHappen()
+                log.reteEvent {
+                    activationHappen()
+                    "ACCEPT HAPPEN: $mdf, $this"
+                }
                 notifyConsumers(mdf.inherit(it))
             }
             else
             {
-                activationFailed()
+                log.reteEvent {
+                    activationFailed()
+                    "ACCEPT IDLE: $mdf, $this"
+                }
             }
             return true
         }
 
+        log.reteEvent {
+            "ACCEPT FAILED: $this"
+        }
         return false
     }
 

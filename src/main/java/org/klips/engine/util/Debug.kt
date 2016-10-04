@@ -6,13 +6,12 @@ import org.klips.engine.rete.AlphaNode
 import org.klips.engine.rete.BetaNode
 import org.klips.engine.rete.Node
 import org.klips.engine.rete.ProxyNode
-import org.klips.engine.rete.builder.ReteBuilderStrategy
 import java.util.concurrent.atomic.AtomicInteger
 
 
 fun Node.printTree(tab:String = "") {
-    val happen = ReteBuilderStrategy[this]?.first  ?: 0
-    val failed = ReteBuilderStrategy[this]?.second ?: 0
+    val happen = log.nodeActivity[this]?.first  ?: 0
+    val failed = log.nodeActivity[this]?.second ?: 0
     val counters = "($happen|$failed)"
     when (this) {
         is BetaNode -> {
@@ -46,13 +45,13 @@ fun collectPattern(n: Node):List<Fact> {
 }
 
 fun Node.activationHappen() {
-    org.klips.engine.rete.builder.ReteBuilderStrategy.getOrPut(this){
+    log.nodeActivity.getOrPut(this){
         Pair(AtomicInteger(0), AtomicInteger(0))
     }.first.incrementAndGet()
 }
 
 fun Node.activationFailed() {
-    org.klips.engine.rete.builder.ReteBuilderStrategy.getOrPut(this){
+    log.nodeActivity.getOrPut(this){
         Pair(AtomicInteger(0), AtomicInteger(0))
     }.second.incrementAndGet()
 }

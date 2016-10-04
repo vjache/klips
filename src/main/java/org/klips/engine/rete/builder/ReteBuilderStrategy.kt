@@ -9,12 +9,8 @@ import org.klips.engine.rete.AlphaNode
 import org.klips.engine.rete.Node
 import org.klips.engine.rete.ReteInput
 import org.klips.engine.util.printTree
-import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
 abstract class ReteBuilderStrategy(patterns : List<RuleClause>) {
-
-    companion object nodeActivity : MutableMap<Node, Pair<AtomicInteger,AtomicInteger>> by HashMap()
 
     protected val unifiedPatterns = findBestSubstitutions(patterns)
 

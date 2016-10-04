@@ -3,8 +3,9 @@ package org.klips.engine.rete
 import org.klips.dsl.Facet
 import org.klips.engine.Binding
 import org.klips.engine.Modification
+import org.klips.engine.util.Log
 
-abstract class Node {
+abstract class Node(val log: Log) {
     abstract val refs : Set<Facet.FacetRef<*>>
     private val consumers_        = mutableListOf<Consumer>()
     val consumers :List<Consumer> = consumers_

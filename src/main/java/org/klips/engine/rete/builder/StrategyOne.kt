@@ -127,7 +127,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
             val rbinding = SimpleBinding(binding.map { Pair(it.value, it.key) })
             // TODO : make p-node pass refs unchanged when no renaming mapping
             val group = unifiedPatterns.second[i].group
-            val proxyNode = ProxyNode(node, rbinding)
+            val proxyNode = ProxyNode(log, node, rbinding)
             proxyNode.addConsumer(object : Consumer {
                 override fun consume(source:
                                      Node, mdf: Modification<Binding>) {
@@ -158,7 +158,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         val nodes0 = mutableSetOf<Node>().apply {
             workGraphs.forEach { wg -> addAll(wg.vertexSet()) }
         }
-        allNodes = nodes0.subtract(Optimizer.optimize(nodes0))
+        allNodes = nodes0.subtract(Optimizer(log).optimize(nodes0))
 
         alphaLayer = mutableSetOf<AlphaNode>().apply {
             allNodes.forEach {

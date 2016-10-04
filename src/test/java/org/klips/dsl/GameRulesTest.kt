@@ -6,13 +6,11 @@ import org.klips.engine.*
 import org.klips.engine.ActorKind.Aim
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
+import org.klips.engine.util.Log
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-/**
- * Created by vj on 08.09.16.
- */
 class GameRulesTest {
 
     @Test

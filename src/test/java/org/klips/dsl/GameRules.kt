@@ -13,7 +13,7 @@ import org.klips.engine.util.Log
 import java.lang.Math.*
 import kotlin.test.assertFailsWith
 
-class GameRules : RuleSet(Log()) {
+class GameRules(log:Log = Log()) : RuleSet(log) {
 
     val triggered = mutableListOf<String>()
 
@@ -24,7 +24,6 @@ class GameRules : RuleSet(Log()) {
     val aid = ref<ActorId>("aid")
     val aid1 = ref<ActorId>("aid1")
     val kind = ref<ActorKind>("kind")
-    val kind1 = ref<ActorKind>("kind1")
     val pid = ref<PlayerId>("pid")
     val pid1 = ref<PlayerId>("pid1")
     val nrgy = ref<Level>("nrgy")
@@ -32,7 +31,6 @@ class GameRules : RuleSet(Log()) {
     val hlth = ref<Level>("hlth")
     val hlth1 = ref<Level>("hlth1")
     val state = ref<State>("state")
-    val state1 = ref<State>("state1")
 
 
     init {
@@ -60,7 +58,7 @@ class GameRules : RuleSet(Log()) {
         rule(name = "Move") { // On Move
 
             -MoveCommand(aid, cid1)
-            val cf = +CommField(aid1,cid1)
+            +CommField(aid1,cid1)
             -At(aid, cid)
             +Adjacent(cid, cid1)
             val a = -Actor(aid = aid, energy = nrgy, state = OnMarch.facet)

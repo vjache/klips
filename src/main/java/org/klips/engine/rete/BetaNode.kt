@@ -12,31 +12,33 @@ import org.klips.engine.util.activationHappen
 import org.klips.engine.util.collectPattern
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class BetaNode(val log: Log, left: Node, right: Node) : Node(), Consumer {
+abstract class BetaNode : Node, Consumer {
 
-    override val refs: Set<FacetRef<*>> = left.refs.union(right.refs)
+    final override val refs: Set<FacetRef<*>>
 
-    val commonRefs: Set<FacetRef<*>> = left.refs.intersect(right.refs)
+    val commonRefs: Set<FacetRef<*>>
 
-    var left: Node = left
+    var left: Node
         set(value) {
             value.addConsumer(this)
             field = value
         }
 
-    var right: Node = right
+    var right: Node
         set(value) {
             value.addConsumer(this)
             field = value
         }
 
-    init {
-        left.addConsumer(this)
-        right.addConsumer(this)
+    constructor(log: Log, l: Node, r: Node):super(log) {
+        left  = l
+        right = r
+        refs  =  l.refs.union(right.refs)
+        commonRefs = left.refs.intersect(right.refs)
     }
 
     protected fun otherSource(source: Node) = when (source) {
-        left -> right
+        left  -> right
         right -> left
         else -> throw IllegalArgumentException("No such source $source.")
     }
@@ -55,10 +57,10 @@ abstract class BetaNode(val log: Log, left: Node, right: Node) : Node(), Consume
             newBinding: Binding,
             cachedBinding: Binding): Binding
 
-    fun other(n:Node) = when (n) {
-        left  -> right
+    fun other(n: Node) = when (n) {
+        left -> right
         right -> left
-        else  -> throw IllegalArgumentException("Failed to get complement node: $n")
+        else -> throw IllegalArgumentException("Failed to get complement node: $n")
     }
 
     companion object dbg {
@@ -73,18 +75,20 @@ abstract class BetaNode(val log: Log, left: Node, right: Node) : Node(), Consume
             dbg.cnt.andIncrement
             val patt1 = collectPattern(source)
             val patt2 = collectPattern(other(source))
-            val hcs = "[${hashCode()}:${left.hashCode()},${right.hashCode()}()]"
-            if (lookupResults.size == 0)
-            {
-                activationFailed()
-                log.reteEvent {
+
+            log.reteEvent {
+                if (lookupResults.size == 0) {
+                    activationFailed()
+                    val hcs = "[${hashCode()}:${left.hashCode()},${right.hashCode()}()]"
                     "JOIN FAIL(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t$patt2"
-                }
+                } else null
             }
+
             val lookupResultsCopy = lookupResults.map { it }
             lookupResultsCopy.forEach {
-                activationHappen()
                 log.reteEvent {
+                    activationHappen()
+                    val hcs = "[${hashCode()}:${left.hashCode()},${right.hashCode()}()]"
                     "JOIN HAPPEN(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t${patt2.substitute(it)}"
                 }
                 notifyConsumers(mdf.inherit(composeBinding(source, binding, it)))
