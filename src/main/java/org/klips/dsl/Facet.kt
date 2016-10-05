@@ -3,6 +3,13 @@ package org.klips.dsl
 import org.klips.dsl.Guard.BinaryPredicate.Code.*
 import java.util.*
 
+/**
+ * This class is an abstraction level for values (constants)
+ * and variables (references). This is required to pass constants
+ * or references to the parameters of constructors of facts.
+ *
+ * @see Fact
+ */
 @Suppress("unused")
 abstract class Facet<T> : Comparable<Facet<*>> {
 
@@ -14,7 +21,6 @@ abstract class Facet<T> : Comparable<Facet<*>> {
                     value.compareTo(other.value as T)
                 else
                     javaClass.name.compareTo(other.javaClass.name)
-
 
         override fun match(f: Facet<*>) = when(f){
             is IntervalFacet<*> ->
@@ -40,7 +46,6 @@ abstract class Facet<T> : Comparable<Facet<*>> {
     }
 
     class IntervalFacet<T:Comparable<T>>(id:String, val min:T, val max:T): FacetRef<T>(id){
-
 
         init{
             if(min > max) throw IllegalArgumentException()

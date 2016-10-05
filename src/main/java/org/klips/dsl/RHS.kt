@@ -7,7 +7,6 @@ import org.klips.engine.Modification
 
 
 class RHS(private val rule : Rule,
-          private val occur : Occur?,
           private val filter : ActivationFilter?,
           private val initBlock: RHS.(Modification<Binding>) -> Unit) :
         AsserterTrait({fact ->

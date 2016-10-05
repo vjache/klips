@@ -2,6 +2,10 @@ package org.klips.dsl
 
 import java.util.*
 
+/**
+ * This abstract class is a context which support facet
+ * creation operators.This class is not intended to be used directly.
+ */
 abstract class FacetBuilder {
     inner class FacetRefImpl<T : Comparable<T>>(id: String) : Facet.FacetRef<T>(id)
 
@@ -9,12 +13,22 @@ abstract class FacetBuilder {
 
     private fun newId() = "${idClock++}"
 
+    /**
+     * Create facet constant. Facet constant wraps particular value.
+     *
+     * @see Facet
+     */
     fun <T : Comparable<T>> const(v:T): Facet<T> = Facet.ConstFacet(v)
 
+    /**
+     * Create named facet reference. Facet reference used to construct
+     * a fact pattern. Several fact patterns form a complex pattern
+     * in which all occurrences of the same reference must be bound to
+     * the same value ([Facet.ConstFacet]).
+     *
+     * @see Facet
+     */
     fun <T : Comparable<T>> ref(id: String) = FacetRefImpl<T>(id)
-
-    infix fun <T:Comparable<T>> Facet.FacetRef<T>.gt2(t: Facet<T>) = Guard.BinaryPredicate(Guard.BinaryPredicate.Code.Gt, this, t)
-    infix fun <T:Comparable<T>> Facet.FacetRef<T>.gt2(t: T) : Guard = gt2(Facet.ConstFacet(t))
 
     fun intRef()                    = intRef(newId())
     fun intRef(id:String)           = FacetRefImpl<Int>(id)

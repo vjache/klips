@@ -29,6 +29,9 @@ class MyRules : RuleSet() {
             val p1 = ref<String>() ; val p2 = ref<String>() ; val p3 = ref<String>()
             +FatherOf(p1, p2)
             +FatherOf(p1, p3)
+            
+            guard(p2 gt p3)
+            
             effect {
                 +SiblingOf(p2, p3)
             }

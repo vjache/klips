@@ -10,7 +10,16 @@
 
     <properties>
         <kotlin.version>1.0.4</kotlin.version>
+        <dokka.version>0.9.9</dokka.version>
     </properties>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jcenter</id>
+            <name>JCenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
         <dependency>
@@ -116,6 +125,32 @@
                         <version>2.19.1</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka.version}</version>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>dokka</goal>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>Module.md</include>
+                    </includes>
+                    <sourceLinks>
+                        <link>
+                            <dir>${project.basedir}</dir>
+                            <url>https://github.com/vjache/klips</url>
+                            <urlSuffix>#L</urlSuffix>
+                        </link>
+                    </sourceLinks>
+                </configuration>
             </plugin>
         </plugins>
     </build>

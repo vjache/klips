@@ -5,6 +5,19 @@ import java.lang.reflect.Field
 import kotlin.reflect.*
 import kotlin.reflect.jvm.kotlinProperty
 
+/**
+ * Fact is a class representing a data piece describing
+ * some aspect of a state of a world. Conceptually fact
+ * is equivalent to the relation from relational algebra
+ * (database theory), and cognate to a relation from a set theory.
+ *
+ * To define rules, firstly one must define an application
+ * domain. Technically this means that a set of subclasses
+ * of a [Fact] must be defined. Each [Fact] subclass must
+ * have a primary constructor with properties of type [Facet].
+ *
+ * @see Facet
+ */
 abstract class Fact() : Cloneable {
 
     private val facetsByName: Map<String, Facet<*>> by lazy {
@@ -61,12 +74,23 @@ abstract class Fact() : Cloneable {
         }
     }
 
+    /**
+     * All facets this fact have.
+     */
     val facets : List<Facet<*>> by lazy{ facetsByName.values.toList() }
 
+    /**
+     * All those facets which are references.
+     */
     @Suppress("UNCHECKED_CAST")
     val refs : List<Facet.FacetRef<*>>
     get() = facets.filter { it is Facet.FacetRef<*> } as List<Facet.FacetRef<*>>
 
+    /**
+     * Creates a new fact instance form this one but with
+     * some facets replaced by others using a lambda. If
+     * lambda returns 'null' then facet will not be replaced.
+     */
     fun substitute(action:(Facet<*>) -> Facet<*>?) : Fact {
         val (constr, fields) = classMeta
         val args = constr.parameters.map {
@@ -83,6 +107,10 @@ abstract class Fact() : Cloneable {
         return newFact
     }
 
+    /**
+     * Creates a new fact instance form this one but with
+     * some facet replaced by other using a replacement pair.
+     */
     fun substitute(what:Facet<*>, with:Facet<*>) = substitute{
         when(it){
             what -> with
@@ -90,10 +118,18 @@ abstract class Fact() : Cloneable {
         }
     }
 
+    /**
+     * Creates a new fact instance form this one but with
+     * some facets replaced by others using a binding.
+     */
     fun substitute(data:Binding) = substitute{
         data[it]
     }
 
+    /**
+     * Creates a new fact instance form this one but with
+     * some facet replaced by other using a replacement pairs.
+     */
     fun substitute(vararg substs : Pair<Facet<*>, Facet<*>>) : Fact{
         val data = mapOf(*substs)
         return substitute{ data[it] }

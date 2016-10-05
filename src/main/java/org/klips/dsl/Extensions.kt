@@ -7,7 +7,7 @@ import org.klips.engine.util.Log
 import java.util.concurrent.atomic.AtomicInteger
 
 fun rules(log: Log, init: RuleSet.() -> Unit): RuleSet {
-    val rs = RuleSet(log)
+    val rs = object : RuleSet(log) {}
     rs.init()
     return rs
 }
