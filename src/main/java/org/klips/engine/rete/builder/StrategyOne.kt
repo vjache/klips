@@ -19,7 +19,7 @@ import java.util.*
 abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         ReteBuilderStrategy(patterns) {
 
-    val agenda = PriorityQueue<Pair<Modification<Binding>, RuleClause>> { x, y ->
+    val agenda = PriorityQueue<Pair<Modification<Binding>, RuleClause>>(100) { x, y ->
         x.second.priority.compareTo(y.second.priority)
     }
 
