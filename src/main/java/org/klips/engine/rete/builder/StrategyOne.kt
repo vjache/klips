@@ -22,7 +22,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
     val agenda = PriorityQueue<Pair<Modification<Binding>, RuleClause>>(100) { x, y ->
         val cmp = x.second.priority.compareTo(y.second.priority)
         if(cmp == 0)
-            y.first.serialNo.compareTo(x.first.serialNo)
+            x.first.serialNo.compareTo(y.first.serialNo)
         else
             cmp
     }
