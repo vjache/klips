@@ -1,7 +1,15 @@
 package org.klips.engine
 
+import java.util.concurrent.atomic.AtomicLong
+
 
 sealed class Modification<T> (val arg:T) {
+
+    companion object {
+        val clock = AtomicLong(0)
+    }
+
+    val serialNo = clock.andIncrement
 
     class Assert<T>(arg:T) : Modification<T>(arg) {
         override fun inverse()           = Retire(arg)

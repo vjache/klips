@@ -20,7 +20,11 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         ReteBuilderStrategy(patterns) {
 
     val agenda = PriorityQueue<Pair<Modification<Binding>, RuleClause>>(100) { x, y ->
-        x.second.priority.compareTo(y.second.priority)
+        val cmp = x.second.priority.compareTo(y.second.priority)
+        if(cmp == 0)
+            y.first.serialNo.compareTo(x.first.serialNo)
+        else
+            cmp
     }
 
     override val input = object : ReteInput {
