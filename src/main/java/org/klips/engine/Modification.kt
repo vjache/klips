@@ -23,7 +23,7 @@ sealed class Modification<T> (val arg:T) {
     abstract fun inverse(): Modification<T>
     abstract fun <A> inherit(arg: A): Modification<A>
 
-    override fun toString() = "${this.javaClass.simpleName}($arg)"
+    override fun toString() = "${this.javaClass.simpleName}[$serialNo]($arg)"
 
     override fun equals(other: Any?): Boolean {
         if (this === other)

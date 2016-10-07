@@ -35,9 +35,9 @@ abstract class AlphaNode(log:Log, val pattern: Fact) : Node(log) {
             return true
         }
 
-        log.reteEvent {
-            "ACCEPT FAILED: $this"
-        }
+//        log.reteEvent {
+//            "ACCEPT FAILED: $this"
+//        }
         return false
     }
 

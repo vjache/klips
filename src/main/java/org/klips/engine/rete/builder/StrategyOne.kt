@@ -34,10 +34,11 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         override fun flush(vararg expect:String) : ReteInput {
             val cache = mutableMapOf<Any, Any>()
             val triggered = mutableSetOf<String>()
+            var effector = "flush"
             var iterCnt = 1
             // While there are effects do ...
             while (effectsQueue.isNotEmpty() || agenda.isNotEmpty()) {
-                log.wmEvent { "--- ${iterCnt++} ---" }
+                log.wmEvent { "--- ${iterCnt++} apply effect of $effector ---" }
                 // 1. Apply effects to appropriate a-nodes
                 while (!effectsQueue.isEmpty()) {
                     val mdf = effectsQueue.remove()
@@ -54,6 +55,8 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
                     ruleClause.trigger.fire(cache, sol) { mdf ->
                         effectsQueue.add(mdf)
                     }
+
+                    log.wmEvent { effector = "[${ruleClause.group}:${ruleClause.priority}] ($sol)"; null }
 
                     if (expect.size > 0) triggered.add(ruleClause.group)
                 }
@@ -131,6 +134,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
             val rbinding = SimpleBinding(binding.map { Pair(it.value, it.key) })
             // TODO : make p-node pass refs unchanged when no renaming mapping
             val group = unifiedPatterns.second[i].group
+            val prio  = unifiedPatterns.second[i].priority
             val proxyNode = ProxyNode(log, node, rbinding)
             proxyNode.addConsumer(object : Consumer {
                 override fun consume(source:
@@ -139,7 +143,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
                     when (mdf) {
                     // Rule clause activated -- place it to agenda
                         is Assert -> {
-                            log.agEvent { "+A [$group] $entry" }
+                            log.agEvent { "+A [$group:$prio] $entry" }
                             agenda.add(entry)
                         }
                     // Rule clause deactivated -- remove it from agenda
@@ -147,11 +151,11 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
                             val antiEntry = Pair(mdf.inverse(), unifiedPatterns.second[i])
                             if (!agenda.remove( antiEntry ))
                             {
-                                log.agEvent { "+A [$group] $entry" }
+                                log.agEvent { "+A [$group:$prio] $entry" }
                                 agenda.add(entry)
                             }
                             else
-                                log.agEvent { "-A [$group] $antiEntry" }
+                                log.agEvent { "-A [$group:$prio] $antiEntry" }
                         }
                     }
                 }
