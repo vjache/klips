@@ -36,7 +36,7 @@ sealed class Modification<T> (val arg:T) {
         val b2 = other is Assert<*>
         if (b1 != b2) return false
 
-        return this.arg!!.equals(other.arg)
+        return this.arg!! == other.arg
     }
 
     override fun hashCode(): Int {
