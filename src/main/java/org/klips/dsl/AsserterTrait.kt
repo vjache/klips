@@ -20,7 +20,7 @@ open class AsserterTrait : Asserter {
 
     constructor(validator: (Fact) -> Unit) { factValidator = validator}
 
-    private fun validate(vararg facts: Fact) {
+    protected fun validate(vararg facts: Fact) {
         factValidator?.let {
             for (f in facts) it(f)
         }

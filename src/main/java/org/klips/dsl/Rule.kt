@@ -64,7 +64,7 @@ class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter b
      * be arbitrary Kotlin code if one wish.
      */
     fun effect(activation: ActivationFilter = AssertOnly,
-               init: RHS.(Modification<Binding>) -> Unit): RHS {
+               init: AsserterEx.(Modification<Binding>) -> Unit): RHS {
         rhs = RHS(this, activation, init)
         checkConnectedByRef(asserted.union(retired))
         return rhs
@@ -167,7 +167,11 @@ class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter b
 
                     retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
                     rhs.retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
+                    if (solution is Retire)
+                        rhs.modified.forEach { addEffect(Retire(it.substitute(solution.arg))) }
                     rhs.asserted.forEach { addEffect(Assert(it.substitute(solution.arg))) }
+                    if (solution is Assert)
+                        rhs.modified.forEach { addEffect(Assert(it.substitute(solution.arg))) }
                 }
             }
         }, group, priority)

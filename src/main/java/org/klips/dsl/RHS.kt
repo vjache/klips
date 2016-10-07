@@ -9,7 +9,7 @@ import org.klips.engine.Modification
 class RHS(private val rule : Rule,
           private val filter : ActivationFilter?,
           private val initBlock: RHS.(Modification<Binding>) -> Unit) :
-        AsserterTrait({fact ->
+        AsserterTraitEx({fact ->
             val unboundRef = fact.refs.filter { it !in rule.refs }
             if(unboundRef.size > 0) throw RHSFactNotBoundException(fact, unboundRef, rule)
         }) {
@@ -17,6 +17,7 @@ class RHS(private val rule : Rule,
     fun init(solution: Modification<Binding>) {
         asserted.clear()
         retired.clear()
+        modified.clear()
         when (filter) {
             Both -> initBlock(solution)
             AssertOnly -> if (solution is Modification.Assert) initBlock(solution)
