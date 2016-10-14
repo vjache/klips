@@ -2,6 +2,7 @@ package org.klips.engine.rule
 
 import org.klips.dsl.Facet
 import org.klips.dsl.Fact
+import org.klips.dsl.substitute
 import org.klips.engine.Binding
 import org.klips.engine.Modification
 import org.klips.engine.rete.builder.RuleClause
@@ -27,7 +28,7 @@ open class RuleTestCommon {
         val rule = createRule(*pattern) { sol, effect ->
             println("Solution : $sol")
             val conditions = pattern.map {
-                sol.inherit(it.substitute(sol.arg))
+                sol.inherit(it.substitute(sol))
             }
             println("Condition : $conditions")
 

@@ -52,7 +52,7 @@ class PatternMatcherTest {
         assertEquals(ActorId(10).facet, b2!![aid])
 
         val pattern2 = AgentToAgentCommand()
-        pattern2.substitute { it }
+        pattern2.substitute<Fact> { it }
         assertNull(PatternMatcher(pattern2).bind(fact))
         assertNotNull(PatternMatcher(pattern2).bind(fact2))
 

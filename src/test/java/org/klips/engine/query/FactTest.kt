@@ -1,11 +1,12 @@
 package org.klips.engine.query
 
-import org.klips.dsl.Facet
 import org.junit.Test
+import org.klips.dsl.Facet
+import org.klips.dsl.Fact
 import org.klips.dsl.facet
+import org.klips.dsl.substitute
 import org.klips.engine.*
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
 import kotlin.test.assertNotEquals
 
 
@@ -13,15 +14,15 @@ class FactTest {
 
     @Test
     fun testClone() {
-        Actor().substitute { it }
-        Player().substitute { it }
-        Adjacent().substitute { it }
-        At().substitute { it }
-        Land().substitute { it }
-        Resource().substitute { it }
-        TapActor().substitute { it }
-        TapCell().substitute { it }
-        ActorSelected().substitute { it }
+        Actor().substitute<Fact> { it }
+        Player().substitute<Fact> { it }
+        Adjacent().substitute<Fact> { it }
+        At().substitute<Fact> { it }
+        Land().substitute<Fact> { it }
+        Resource().substitute<Fact> { it }
+        TapActor().substitute<Fact> { it }
+        TapCell().substitute<Fact> { it }
+        ActorSelected().substitute<Fact> { it }
     }
 
     @Test
@@ -70,7 +71,7 @@ class FactTest {
         assertEquals(ActorKind.Comm.facet, a.type)
         assertEquals(Level(100f).facet, a.energy)
 
-        val a1 = a.substitute(ActorId(1).facet, ActorId(2).facet) as Actor
+        val a1 = a.substitute(ActorId(1).facet, ActorId(2).facet)
 
         assertEquals(ActorId(2).facet, a1.aid)
         assertEquals(PlayerId(1).facet, a1.pid)

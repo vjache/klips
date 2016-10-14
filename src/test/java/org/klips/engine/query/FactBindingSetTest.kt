@@ -8,6 +8,7 @@ import org.klips.dsl.Facet.FacetRef
 import org.klips.dsl.Facet.IntFacet
 import org.klips.dsl.Fact
 import org.klips.dsl.ref
+import org.klips.dsl.substitute
 import org.klips.engine.PatternMatcher
 import kotlin.test.assertEquals
 

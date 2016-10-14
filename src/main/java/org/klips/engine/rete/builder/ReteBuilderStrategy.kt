@@ -3,6 +3,7 @@ package org.klips.engine.rete.builder
 import org.klips.dsl.Facet
 import org.klips.dsl.Facet.FacetRef
 import org.klips.dsl.Fact
+import org.klips.dsl.substitute
 import org.klips.engine.Binding
 import org.klips.engine.query.JoinBindingSet.JoinType.FullOuter
 import org.klips.engine.rete.AlphaNode
@@ -71,7 +72,7 @@ abstract class ReteBuilderStrategy(patterns : List<RuleClause>) {
     private fun decoratePattern(i: Int, pattern0: Set<Fact>): Pair<Set<Fact>, Map<Facet<*>, Facet<*>>> {
         val decMap = mutableMapOf<Facet<*>, Facet<*>>()
         return Pair(pattern0.map { fact ->
-            fact.substitute {
+            fact.substitute<Fact> {
                 if (it is FacetRef) {
                     val decFacet = it.decorated(postfix = "_$i")
                     decMap[it] = decFacet
