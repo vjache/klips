@@ -4,5 +4,5 @@ interface AsserterEx : Asserter {
 
     val modified: List<Fact>
 
-    operator fun Fact.not():Fact
+    operator fun <T : Fact> T.not():T
 }
