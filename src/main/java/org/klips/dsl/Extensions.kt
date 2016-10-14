@@ -27,6 +27,10 @@ fun <T:Comparable<T>> ref(name:String? = null) =
 
 fun <T : Fact> Iterable<T>.substitute(data:Binding)     = this.map { it.substitute(data) }
 fun <T : Fact> T.substitute(data:Modification<Binding>) = this.substitute(data.arg)
+fun <T : Fact> Binding.substitute(vararg facts : T) : List<T> =
+        facts.map { it.substitute(this) }
+fun <T : Fact> Modification<Binding>.substitute(vararg facts : T) : List<T> =
+        facts.map { it.substitute(this) }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
