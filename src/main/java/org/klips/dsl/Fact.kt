@@ -1,6 +1,5 @@
 package org.klips.dsl
 
-import org.klips.engine.Binding
 import java.lang.reflect.Field
 import kotlin.reflect.*
 import kotlin.reflect.jvm.kotlinProperty
@@ -91,7 +90,8 @@ abstract class Fact() : Cloneable {
      * some facets replaced by others using a lambda. If
      * lambda returns 'null' then facet will not be replaced.
      */
-    fun substitute(action:(Facet<*>) -> Facet<*>?) : Fact {
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Fact> substitute(action:(Facet<*>) -> Facet<*>?) : T {
         val (constr, fields) = classMeta
         val args = constr.parameters.map {
             val arg = fields[it.name]!!.call(this)
@@ -103,36 +103,8 @@ abstract class Fact() : Cloneable {
                 arg
         }
         val arr:Array<Any?> = args.toTypedArray()
-        val newFact = constr.call(*arr) as Fact
+        val newFact = constr.call(*arr) as T
         return newFact
-    }
-
-    /**
-     * Creates a new fact instance form this one but with
-     * some facet replaced by other using a replacement pair.
-     */
-    fun substitute(what:Facet<*>, with:Facet<*>) = substitute{
-        when(it){
-            what -> with
-            else -> null
-        }
-    }
-
-    /**
-     * Creates a new fact instance form this one but with
-     * some facets replaced by others using a binding.
-     */
-    fun substitute(data:Binding) = substitute{
-        data[it]
-    }
-
-    /**
-     * Creates a new fact instance form this one but with
-     * some facet replaced by other using a replacement pairs.
-     */
-    fun substitute(vararg substs : Pair<Facet<*>, Facet<*>>) : Fact{
-        val data = mapOf(*substs)
-        return substitute{ data[it] }
     }
 
     override fun hashCode(): Int {

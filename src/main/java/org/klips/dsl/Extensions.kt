@@ -25,4 +25,36 @@ fun <T:Comparable<T>> ref(name:String? = null) =
         else
             FacetRef<T>(name)
 
-fun Iterable<Fact>.substitute(data:Binding) = this.map { it.substitute(data) }
+fun <T : Fact> Iterable<T>.substitute(data:Binding)     = this.map { it.substitute(data) }
+fun <T : Fact> T.substitute(data:Modification<Binding>) = this.substitute(data.arg)
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * Creates a new fact instance form this one but with
+ * some facet replaced by other using a replacement pair.
+ */
+fun <T : Fact> T.substitute(what:Facet<*>, with:Facet<*>) : T = this.substitute {
+    when(it) {
+        what -> with
+        else -> null
+    }
+}
+
+/**
+ * Creates a new fact instance form this one but with
+ * some facets replaced by others using a binding.
+ */
+fun <T : Fact> T.substitute(data:Binding) : T = this.substitute {
+    data[it]
+}
+
+/**
+ * Creates a new fact instance form this one but with
+ * some facet replaced by other using a replacement pairs.
+ */
+fun <T : Fact> T.substitute(vararg substs : Pair<Facet<*>, Facet<*>>) : T {
+    val data = mapOf(*substs)
+    return this.substitute{ data[it] }
+}
