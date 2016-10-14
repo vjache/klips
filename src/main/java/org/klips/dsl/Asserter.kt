@@ -8,12 +8,12 @@ interface Asserter {
     fun assert(vararg facts: Fact): Array<out Fact>
     fun retire(vararg facts: Fact): Array<out Fact>
 
-    operator fun Fact.unaryPlus():Fact {
+    operator fun <T : Fact> T.unaryPlus() : T {
         assert(this)
         return this
     }
 
-    operator fun Fact.unaryMinus():Fact {
+    operator fun <T : Fact> T.unaryMinus() : T {
         retire(this)
         return this
     }
