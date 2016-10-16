@@ -1,28 +1,48 @@
 package org.klips.dsl
 
-import org.klips.RHSFactNotBoundException
-import org.klips.dsl.ActivationFilter.*
 import org.klips.engine.Binding
 import org.klips.engine.Modification
+import org.klips.engine.rete.ReteInput
 
 
-class RHS(private val rule : Rule,
-          private val filter : ActivationFilter?,
-          private val initBlock: RHS.(Modification<Binding>) -> Unit) :
-        AsserterTraitEx({fact ->
-            val unboundRef = fact.refs.filter { it !in rule.refs }
-            if(unboundRef.size > 0) throw RHSFactNotBoundException(fact, unboundRef, rule)
-        }) {
+interface RHS : Asserter {
 
-    fun init(solution: Modification<Binding>) {
-        asserted.clear()
-        retired.clear()
-        modified.clear()
-        when (filter) {
-            Both -> initBlock(solution)
-            AssertOnly -> if (solution is Modification.Assert) initBlock(solution)
-            RetireOnly -> if (solution is Modification.Retire) initBlock(solution)
-        }
-    }
+    val modified: List<Fact>
 
+    /**
+     * This method is designed to flush facts into WM of other rule set.
+     * One advantage from using standard [ReteInput.flush] is that
+     * refs in aa asserted or retired facts are automatically substituted
+     * with current solution of this RHS. Another feature is to use unary
+     * operator '!' which is also sensitive to current solution.
+     *
+     * If to use [ReteInput.flush] to pass facts to other rule set WM:
+     * ```
+     * rule {
+     *  +SomeFact(x,y)
+     *  effect { sol ->
+     *      +SomeThirdFact(x,y,w)
+     *      otherRuleSet.input.pass {
+     *          +SomeAnotherFact(x,y,w).substitute(sol)
+     *      }
+     *  }
+     * }
+     * ```
+     * If to use [pass] to pass facts to other rule set WM:
+     * ```
+     * rule {
+     *  +SomeFact(x,y)
+     *  effect {
+     *      +SomeThirdFact(x,y,w)
+     *      otherRuleSet.input.pass {
+     *          +SomeAnotherFact(x,y,w)
+     *      }
+     *  }
+     * }
+     * ```
+     * But if
+     */
+    fun ReteInput.pass(block:RHS.(Modification<Binding>) -> Unit)
+
+    operator fun <T : Fact> T.not():T
 }

@@ -51,7 +51,7 @@ abstract class RuleSet(val log: Log) : FacetBuilder() {
     /**
      * Use this high order function to define a rule. It is expected
      * that lambda passed to this function constructs a pattern and
-     * returns an RHS i.e. effect. The pattern constructed using unary
+     * returns an RHSImpl i.e. effect. The pattern constructed using unary
      * operators + and - which accept a fact pattern.
      *
      * Rule can be named, use 'name' parameter to pass name. Name of

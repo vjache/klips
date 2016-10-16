@@ -32,13 +32,15 @@ class GameRules(log:Log = Log()) : RuleSet(log) {
     val hlth1 = ref<Level>("hlth1")
     val state = ref<State>("state")
 
-
     init {
 
         rule(name = "Adj-Symmetry") { // Symmetry of adjacency
             +Adjacent(cid, cid1)
             effect {
                 +Adjacent(cid1, cid)
+                OtherGameRules.input.pass {
+                    +Adjacent(cid1, cid)
+                }
             }
         }
 

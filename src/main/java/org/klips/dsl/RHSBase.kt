@@ -1,6 +1,7 @@
 package org.klips.dsl
 
-open class AsserterTraitEx(validator: (Fact) -> Unit) : AsserterTrait(validator), AsserterEx {
+internal abstract class RHSBase(validator: (Fact) -> Unit) : AsserterTrait(validator), RHS {
+
     override val modified = mutableListOf<Fact>()
 
     override fun <T : Fact> T.not(): T {

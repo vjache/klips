@@ -17,7 +17,7 @@ import kotlin.properties.Delegates.notNull
  * This class defines a production rule. Such a rule have
  * its condition (LHS), additional constraint (guard) and effect (RHS).
  *
- * Condition is a pattern described y a set of facts with references
+ * Condition is a pattern described by a set of facts with references
  * and constants. The pattern must be connected by references.
  *
  * The rule condition is evaluated against working memory of
@@ -47,7 +47,7 @@ import kotlin.properties.Delegates.notNull
 class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter by AsserterTrait({}) {
 
     private val guards = MultiJunction(And)
-    private var rhs by notNull<RHS>()
+    private var rhs by notNull<RHSImpl>()
 
     val refs: Set<Facet.FacetRef<*>> by lazy {
         mutableSetOf<Facet.FacetRef<*>>().apply {
@@ -64,8 +64,8 @@ class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter b
      * be arbitrary Kotlin code if one wish.
      */
     fun effect(activation: ActivationFilter = AssertOnly,
-               init: AsserterEx.(Modification<Binding>) -> Unit): RHS {
-        rhs = RHS(this, activation, init)
+               init: RHS.(Modification<Binding>) -> Unit): RHS {
+        rhs = RHSImpl(this, activation, init)
         checkConnectedByRef(asserted.union(retired))
         return rhs
     }
@@ -165,13 +165,36 @@ class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter b
                 if (guards.eval(cache, solution)) {
                     rhs.init(solution)
 
-                    retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
-                    rhs.retired.forEach { addEffect(Retire(it.substitute(solution.arg))) }
+                    // 1. Retire phase
+                    retired.forEach { addEffect(Retire(it.substitute(solution))) }
+                    rhs.retired.forEach { addEffect(Retire(it.substitute(solution))) }
                     if (solution is Retire)
-                        rhs.modified.forEach { addEffect(Retire(it.substitute(solution.arg))) }
-                    rhs.asserted.forEach { addEffect(Assert(it.substitute(solution.arg))) }
+                        rhs.modified.forEach { addEffect(Retire(it.substitute(solution))) }
+                    // 2. Assert phase
+                    rhs.asserted.forEach { addEffect(Assert(it.substitute(solution))) }
                     if (solution is Assert)
-                        rhs.modified.forEach { addEffect(Assert(it.substitute(solution.arg))) }
+                        rhs.modified.forEach { addEffect(Assert(it.substitute(solution))) }
+
+                    // 3. If there is a gateway then do pass
+                    rhs.gateway?.let { gw ->
+                        gw.dest.flush {
+                            gw.retired.forEach {
+                                -it.substitute(solution)
+                            }
+                            gw.asserted.forEach {
+                                +it.substitute(solution)
+                            }
+                            when(solution)
+                            {
+                                is Assert -> gw.modified.forEach {
+                                    +it.substitute(solution)
+                                }
+                                is Retire -> gw.modified.forEach {
+                                    -it.substitute(solution)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }, group, priority)

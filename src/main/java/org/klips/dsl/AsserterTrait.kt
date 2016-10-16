@@ -1,6 +1,6 @@
 package org.klips.dsl
 
-open class AsserterTrait : Asserter {
+internal open class AsserterTrait : Asserter {
     override val asserted = mutableListOf<Fact>()
     override val retired  = mutableListOf<Fact>()
 
