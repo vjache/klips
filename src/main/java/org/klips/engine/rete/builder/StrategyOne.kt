@@ -89,45 +89,45 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         val anodeByFact = mutableMapOf<Fact, AlphaNode>()
         val weights = mutableMapOf<Pair<Node, Node>, Double>()
 
-        val workGraphs = unifiedPatterns.second.map { ruleClause ->
+        val workGraphs = unifiedPatterns.second.mapIndexed { i, ruleClause ->
             // Create work graph of A/B-nodes for ruleClause
-            createWorkGraph(weights).apply {
+            val w = createWorkGraph(weights).apply {
                 ruleClause.pattern.forEach { fact ->
                     addVertex(anodeByFact.getOrPut(fact) {
                         createAlphaNode(fact)
                     })
                 }
             }
+            Pair(i,w)
         }
 
         val betaNodeRegistry = mutableMapOf<Pair<Node, Node>, BetaNode>()
 
         val workGraphsSorted = workGraphs.sortedBy { workGraph ->
-            with(workGraph) {
+            with(workGraph.second) {
                 edgeSet().map { getEdgeWeight(it) }.min()
             }
         }
 
         do {
             var complete = workGraphsSorted.map { workGraph ->
-                workGraph.reduceWorkGraph(betaNodeRegistry)
+                workGraph.second.reduceWorkGraph(betaNodeRegistry)
             }.all { it }
         } while (!complete)
 
         workGraphsSorted.forEach { workGraph ->
-            if (!workGraph.edgeSet().isEmpty())
+            if (!workGraph.second.edgeSet().isEmpty())
                 throw IllegalStateException("Still have edges: $workGraph")
 
-            if (workGraph.vertexSet().size != 1)
+            if (workGraph.second.vertexSet().size != 1)
                 throw IllegalStateException("Still have more than one vertices: $workGraph")
         }
 
         // Bind remaining rete node with trigger
 
-        val workGraphsByIndex = workGraphs.mapIndexed{ i,w -> Pair(w,i)}.toMap()
         roots = workGraphsSorted.map { workGraph ->
-            val i       = workGraphsByIndex[workGraph]!!
-            val node    = workGraph.vertexSet().first()
+            val i       = workGraph.first
+            val node    = workGraph.second.vertexSet().first()
             val binding = unifiedPatterns.first[i]
 
             // TODO : reverse binding
@@ -164,7 +164,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         }
 
         val nodes0 = mutableSetOf<Node>().apply {
-            workGraphs.forEach { wg -> addAll(wg.vertexSet()) }
+            workGraphs.forEach { wg -> addAll(wg.second.vertexSet()) }
         }
         allNodes = nodes0.subtract(Optimizer(log).optimize(nodes0))
 

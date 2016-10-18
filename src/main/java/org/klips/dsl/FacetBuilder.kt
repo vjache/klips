@@ -28,7 +28,7 @@ abstract class FacetBuilder {
      *
      * @see Facet
      */
-    fun <T : Comparable<T>> ref(id: String) = FacetRefImpl<T>(id)
+    fun <T : Comparable<T>> ref(id: String) : Facet.FacetRef<T> = FacetRefImpl(id)
 
     fun intRef()                    = intRef(newId())
     fun intRef(id:String)           = FacetRefImpl<Int>(id)
