@@ -3,13 +3,14 @@ package org.klips.engine.rete.builder.optimizer
 import org.klips.engine.Binding
 import org.klips.engine.rete.*
 import org.klips.engine.util.Log
+import java.util.*
 
 
 class Optimizer(val log:Log) {
 
     fun optimize(nodes: Set<Node>): Set<Node> {
 
-        val roots = detectRoots(nodes)
+        val roots = ArrayList(detectRoots(nodes))
 
         val replaced = mutableSetOf<Node>()
 
@@ -22,6 +23,7 @@ class Optimizer(val log:Log) {
             findMaxMatch(index)?.let {
                 val (t1, t2, b) = it
                 replace(t1.reteNode, t2.reteNode, b)
+                roots.remove(t2.reteNode)
                 replaced.add(t2.reteNode)
                 return true
             }
