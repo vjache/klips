@@ -1,25 +1,50 @@
 package org.klips.engine
 
 import org.klips.dsl.Facet
-import org.klips.engine.util.ListSet
 import org.klips.engine.util.MappedCollectionSet
-import org.klips.engine.util.SimpleEntry
 import kotlin.collections.Map.Entry
 
 class ComposeBinding(val left: Binding, val right: Binding) : Binding() {
 
-    override val entries: Set<Entry<Facet<*>, Facet<*>>> =
-        ListSet {
-            left.keys.union(right.keys).map { k ->
-            SimpleEntry(k, left.getOrElse(k){right[k]!!})
-        }}
+    //    override val entries: Set<Entry<Facet<*>, Facet<*>>> =
+//            ListSet {
+//                left.keys.union(right.keys).map { k ->
+//                    SimpleEntry(k, left.getOrElse(k) { right[k]!! })
+//                }
+//            }
+    override val entries = object : Set<Entry<Facet<*>, Facet<*>>> {
+        override val size: Int
+            get() = left.size + right.count { it.key !in left.keys }
 
-    override val keys: Set<Facet<*>> = MappedCollectionSet(entries){it.key}
+        override fun contains(element: Entry<Facet<*>, Facet<*>>) =
+                element in left.entries || element in right.entries
+
+        override fun containsAll(elements: Collection<Entry<Facet<*>, Facet<*>>>) =
+            elements.all { it in this }
+
+        override fun isEmpty() = this@ComposeBinding.isEmpty()
+
+        override fun iterator(): Iterator<Entry<Facet<*>, Facet<*>>> = object : AbstractIterator<Entry<Facet<*>, Facet<*>>>() {
+            val leftIt  = left.iterator()
+            val rightIt = right.iterator()
+            override fun computeNext() {
+                if (leftIt.hasNext()) {
+                    setNext(leftIt.next())
+                } else if (rightIt.hasNext()) {
+                    setNext(rightIt.next())
+                } else done()
+            }
+
+        }
+
+    }
+
+    override val keys: Set<Facet<*>> = MappedCollectionSet(entries) { it.key }
 
     override val size: Int
-    get() = keys.size
+        get() = keys.size
 
-    override val values: Collection<Facet<*>> = MappedCollectionSet(entries){it.value}
+    override val values: Collection<Facet<*>> = MappedCollectionSet(entries) { it.value }
 
     override fun containsKey(key: Facet<*>) = left.keys.contains(key) || right.keys.contains(key)
 
@@ -29,7 +54,7 @@ class ComposeBinding(val left: Binding, val right: Binding) : Binding() {
 
     override fun get(key: Facet<*>): Facet<*>? {
         val facet = left[key]
-        return when(facet){
+        return when (facet) {
             null -> right[key]
             else -> facet
         }
