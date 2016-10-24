@@ -1,6 +1,8 @@
 package org.klips.dsl
 
+import org.klips.dsl.Facet.FacetRef
 import java.lang.reflect.Field
+import java.util.*
 import kotlin.reflect.*
 import kotlin.reflect.jvm.kotlinProperty
 
@@ -18,13 +20,6 @@ import kotlin.reflect.jvm.kotlinProperty
  * @see Facet
  */
 abstract class Fact() : Cloneable {
-
-    private val facetsByName: Map<String, Facet<*>> by lazy {
-        val fields = classMeta.second
-        fields.mapValues {
-            it.value.call(this) as org.klips.dsl.Facet<*>
-        }
-    }
 
     private val classMeta: Pair<KFunction<*>, Map<String, KProperty.Getter<*>>> = let {
             val jc = this.javaClass
@@ -76,14 +71,24 @@ abstract class Fact() : Cloneable {
     /**
      * All facets this fact have.
      */
-    val facets : List<Facet<*>> by lazy{ facetsByName.values.toList() }
+    val facets : List<Facet<*>>
+        get() = facets_!!
+
+    private val facets_ : List<Facet<*>>? = null
+        get(){
+            if (field == null)
+            {
+                field = classMeta.second.map { it.value.call(this) as Facet<*> }
+            }
+            return field
+        }
 
     /**
      * All those facets which are references.
      */
     @Suppress("UNCHECKED_CAST")
-    val refs : List<Facet.FacetRef<*>>
-    get() = facets.filter { it is Facet.FacetRef<*> } as List<Facet.FacetRef<*>>
+    val refs : List<FacetRef<*>>
+    get() = facets.filter { it is FacetRef<*> } as List<FacetRef<*>>
 
     /**
      * Creates a new fact instance form this one but with
@@ -110,8 +115,10 @@ abstract class Fact() : Cloneable {
     override fun hashCode(): Int {
         var hc = this.javaClass.hashCode()
 
-        for(i in facets.indices)
-            hc += (i+1) * facets[i].hashCode()
+        val fcs = facets_!!
+
+        for(i in fcs.indices)
+            hc += (i+1) * fcs[i].hashCode()
 
         return hc
     }
@@ -123,13 +130,15 @@ abstract class Fact() : Cloneable {
         if(javaClass != other.javaClass)
             return false
 
-        for(i in other.facets.indices)
-            if(facets[i] != other.facets[i])
+        val fcs1 = facets_!!
+        val fcs2 = other.facets_!!
+        for(i in fcs2.indices)
+            if(fcs1[i] != fcs2[i])
                 return false
 
         return true
     }
 
-    override fun toString() = "${this.javaClass.simpleName}$facetsByName"
+    override fun toString() = "${this.javaClass.simpleName}${classMeta.second.mapValues { it.value.call(this) as Facet<*> }}"
 
 }

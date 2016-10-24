@@ -24,6 +24,7 @@ class GameRules(log:Log = Log()) : RuleSet(log) {
     val aid = ref<ActorId>("aid")
     val aid1 = ref<ActorId>("aid1")
     val kind = ref<ActorKind>("kind")
+    val kind1 = ref<ActorKind>("kind1")
     val pid = ref<PlayerId>("pid")
     val pid1 = ref<PlayerId>("pid1")
     val nrgy = ref<Level>("nrgy")
@@ -31,6 +32,7 @@ class GameRules(log:Log = Log()) : RuleSet(log) {
     val hlth = ref<Level>("hlth")
     val hlth1 = ref<Level>("hlth1")
     val state = ref<State>("state")
+    val state1 = ref<State>("state1")
 
     init {
 

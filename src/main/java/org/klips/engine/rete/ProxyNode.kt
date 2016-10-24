@@ -5,6 +5,7 @@ import org.klips.dsl.Facet.FacetRef
 import org.klips.engine.Binding
 import org.klips.engine.Modification
 import org.klips.engine.util.Log
+import org.klips.engine.util.SimpleEntry
 import org.klips.engine.util.activationHappen
 import kotlin.collections.Map.Entry
 
@@ -43,15 +44,15 @@ class ProxyNode(log:Log, node: Node, val renamingBinding: Binding) : Node(log), 
 
     inner class ProxyBinding(val data: Binding) : Binding() {
         override val entries: Set<Entry<Facet<*>, Facet<*>>> by lazy {
-            data.map { object : Entry<Facet<*>, Facet<*>> {
-                override val key   = renamingBinding[it.key] ?: it.key
-                override val value = it.value
-            } }.toSet()
+            data.map { SimpleEntry(renamingBinding[it.key] ?: it.key, it.value) }.toSet()
         }
 
-        override val keys   = this@ProxyNode.refs
-        override val size   = keys.size
-        override val values = data.values
+        override val keys: Set<FacetRef<*>>
+            get() = this@ProxyNode.refs
+        override val size: Int
+            get() = keys.size
+        override val values: Collection<Facet<*>>
+            get () = data.values
 
         override fun containsKey(key: Facet<*>)     = keys.contains(key)
         override fun containsValue(value: Facet<*>) = values.contains(value)

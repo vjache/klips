@@ -139,3 +139,11 @@ class GameScenarioTest {
     }
 
 }
+
+fun main(args: Array<String>) {
+    System.out.print(">>")
+    System.`in`.read()
+    GameScenarioTest().main()
+    System.out.print(">>>")
+    System.`in`.read()
+}

@@ -1,25 +1,25 @@
 package org.klips.engine
 
 import org.klips.dsl.Facet
+import org.klips.engine.util.ListSet
+import org.klips.engine.util.MappedCollectionSet
+import org.klips.engine.util.SimpleEntry
 import kotlin.collections.Map.Entry
 
 class ComposeBinding(val left: Binding, val right: Binding) : Binding() {
-    data class EntryImpl(override val key: Facet<*>, override val value: Facet<*>) : Entry<Facet<*>, Facet<*>>
-    override val entries: Set<Entry<Facet<*>, Facet<*>>> by lazy {
-        keys.mapTo(mutableSetOf()) { k ->
-            EntryImpl(k, left.getOrElse(k){right[k]!!})
-        }
-    }
-    override val keys: Set<Facet<*>> by lazy {
-        left.keys.union(right.keys)
-    }
-    override val size: Int by lazy { keys.size }
-    override val values: Collection<Facet<*>> by lazy {
-        val s = mutableSetOf<Facet<*>>()
-        s.addAll(left.values)
-        s.addAll(right.values)
-        s
-    }
+
+    override val entries: Set<Entry<Facet<*>, Facet<*>>> =
+        ListSet {
+            left.keys.union(right.keys).map { k ->
+            SimpleEntry(k, left.getOrElse(k){right[k]!!})
+        }}
+
+    override val keys: Set<Facet<*>> = MappedCollectionSet(entries){it.key}
+
+    override val size: Int
+    get() = keys.size
+
+    override val values: Collection<Facet<*>> = MappedCollectionSet(entries){it.value}
 
     override fun containsKey(key: Facet<*>) = left.keys.contains(key) || right.keys.contains(key)
 

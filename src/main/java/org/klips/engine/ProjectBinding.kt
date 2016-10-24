@@ -1,30 +1,20 @@
 package org.klips.engine
 
 import org.klips.dsl.Facet
+import org.klips.engine.util.ListSet
+import org.klips.engine.util.SimpleEntry
+import kotlin.collections.Map.Entry
 
 
-class ProjectBinding(subRefs: Set<Facet<*>>, former:Binding) : Binding() {
-    override val entries: Set<Map.Entry<Facet<*>, Facet<*>>>
-        get() = subMap.entries
+class ProjectBinding(override val keys: Set<Facet<*>>, val former:Binding) : Binding() {
+
+    override val entries: Set<Entry<Facet<*>, Facet<*>>> = ListSet{ keys.map { SimpleEntry(it, former[it]!!) } }
     override val size: Int
-        get() = subMap.size
+        get() = keys.size
     override val values: Collection<Facet<*>>
-        get() = subMap.values
-    override fun containsKey(key: Facet<*>)       = subMap.containsKey(key)
-    override fun containsValue(value: Facet<*>) = subMap.containsValue(value)
-    override fun isEmpty() = subMap.isEmpty()
-
-    override val keys: Set<Facet<*>>
-        get() = subMap.keys
-
-    private val subMap = mutableMapOf<Facet<*>, Facet<*>>()
-
-    init{
-        for(ref in subRefs){
-            val f = former[ref]
-            if(f != null) subMap[ref] = f
-        }
-    }
-    override fun get(key: Facet<*>) = subMap[key]
-
+        get() = keys.map { former[it]!! }
+    override fun containsKey(key: Facet<*>)     = key in keys
+    override fun containsValue(value: Facet<*>) = value in values
+    override fun isEmpty()                      = keys.isEmpty()
+    override fun get(key: Facet<*>)             = if (key in keys) former[key] else null
 }
