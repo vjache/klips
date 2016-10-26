@@ -5,13 +5,6 @@ import org.klips.engine.util.MappedCollectionSet
 import kotlin.collections.Map.Entry
 
 class ComposeBinding(val left: Binding, val right: Binding) : Binding() {
-
-    //    override val entries: Set<Entry<Facet<*>, Facet<*>>> =
-//            ListSet {
-//                left.keys.union(right.keys).map { k ->
-//                    SimpleEntry(k, left.getOrElse(k) { right[k]!! })
-//                }
-//            }
     override val entries = object : Set<Entry<Facet<*>, Facet<*>>> {
         override val size: Int
             get() = left.size + right.count { it.key !in left.keys }
@@ -31,7 +24,16 @@ class ComposeBinding(val left: Binding, val right: Binding) : Binding() {
                 if (leftIt.hasNext()) {
                     setNext(leftIt.next())
                 } else if (rightIt.hasNext()) {
-                    setNext(rightIt.next())
+                    var rval = rightIt.next()
+                    while (rval.key in left.keys) {
+                        if (rightIt.hasNext())
+                            rval = rightIt.next()
+                        else {
+                            done()
+                            return
+                        }
+                    }
+                    setNext(rval)
                 } else done()
             }
 

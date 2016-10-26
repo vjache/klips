@@ -4,6 +4,7 @@ import org.klips.dsl.Facet
 import org.klips.dsl.Facet.FacetRef
 import org.klips.engine.Binding
 import org.klips.engine.Modification
+import org.klips.engine.util.ListSet
 import org.klips.engine.util.Log
 import org.klips.engine.util.SimpleEntry
 import org.klips.engine.util.activationHappen
@@ -24,6 +25,10 @@ class ProxyNode(log:Log, node: Node, val renamingBinding: Binding) : Node(log), 
 
     val bindingRevIndex = mutableMapOf<Facet<*>, Facet<*>>().apply {
         renamingBinding.forEach { put(it.value, it.key) }
+        if (size != renamingBinding.size)
+            throw IllegalStateException("Renaming must be bijection.")
+        if (renamingBinding.all { it.key == it.value })
+            throw IllegalStateException("Renaming must not be identity.")
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -43,8 +48,8 @@ class ProxyNode(log:Log, node: Node, val renamingBinding: Binding) : Node(log), 
     override fun toString() = "P-Node($refs) [${System.identityHashCode(this)}]"
 
     inner class ProxyBinding(val data: Binding) : Binding() {
-        override val entries: Set<Entry<Facet<*>, Facet<*>>> by lazy {
-            data.map { SimpleEntry(renamingBinding[it.key] ?: it.key, it.value) }.toSet()
+        override val entries: Set<Entry<Facet<*>, Facet<*>>> = ListSet {
+            data.map { SimpleEntry(renamingBinding[it.key] ?: it.key, it.value) }
         }
 
         override val keys: Set<FacetRef<*>>
