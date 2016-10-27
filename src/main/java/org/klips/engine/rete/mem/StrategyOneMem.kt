@@ -1,7 +1,9 @@
-package org.klips.engine.rete.builder
+package org.klips.engine.rete.mem
 
 import org.klips.dsl.Fact
 import org.klips.engine.rete.Node
+import org.klips.engine.rete.builder.RuleClause
+import org.klips.engine.rete.builder.StrategyOne
 import org.klips.engine.rete.mem.MemAlphaNode
 import org.klips.engine.rete.mem.MemBetaNode
 import org.klips.engine.util.Log

@@ -4,7 +4,7 @@ import org.klips.dsl.Facet.FacetRef
 import org.klips.dsl.Fact
 import org.klips.engine.*
 import org.klips.engine.rete.builder.RuleClause
-import org.klips.engine.rete.builder.StrategyOneMem
+import org.klips.engine.rete.mem.StrategyOneMem
 import org.klips.engine.rete.builder.Trigger
 import org.jgrapht.DirectedGraph
 import org.jgrapht.graph.SimpleDirectedGraph

@@ -17,6 +17,9 @@ operator fun <T:Comparable<T>> Modification<Binding>.get(f: Facet<T>) = arg.fetc
 val <T:Comparable<T>> T.facet:Facet<T>
     get() = Facet.ConstFacet(this)
 
+val <T:Comparable<T>> Facet<T>.value:T
+    get() = (this as Facet.ConstFacet<T>).value
+
 private val refCnt = AtomicInteger(0)
 
 fun <T:Comparable<T>> ref(name:String? = null) =

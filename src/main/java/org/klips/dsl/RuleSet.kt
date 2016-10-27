@@ -2,7 +2,7 @@ package org.klips.dsl
 
 import org.klips.engine.rete.ReteInput
 import org.klips.engine.rete.builder.ReteBuilderStrategy
-import org.klips.engine.rete.builder.StrategyOneMem
+import org.klips.engine.rete.mem.StrategyOneMem
 import org.klips.engine.util.Log
 
 /**

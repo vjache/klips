@@ -10,18 +10,19 @@ import org.klips.engine.query.SimpleBindingSet
 import org.klips.engine.rete.BetaNode
 import org.klips.engine.rete.Node
 import org.klips.engine.util.Log
+import java.util.*
 
 class MemBetaNode(log: Log, l: Node, r: Node) : BetaNode(log, l, r) {
 
-    private val leftIndex = mutableMapOf<Binding, MutableSet<Binding>>()
-    private val rightIndex = mutableMapOf<Binding, MutableSet<Binding>>()
+    private val leftIndex  = HashMap<Binding, HashSet<Binding>>()
+    private val rightIndex = HashMap<Binding, HashSet<Binding>>()
 
     override fun modifyIndex(source: Node, key: Binding, mdf: Modification<Binding>): Boolean {
         val values = when (source) {
             left  -> leftIndex
             right -> rightIndex
             else -> throw IllegalArgumentException()
-        }.getOrPut(key) { mutableSetOf() }
+        }.getOrPut(key) { HashSet(8) }
         val value = mdf.arg
         when(mdf){
             is Assert -> {

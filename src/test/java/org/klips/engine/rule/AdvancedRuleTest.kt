@@ -4,7 +4,7 @@ import org.klips.engine.*
 import org.klips.engine.Modification.Assert
 import org.klips.engine.query.*
 import org.klips.engine.rete.builder.ReteBuilderStrategy
-import org.klips.engine.rete.builder.StrategyOneMem
+import org.klips.engine.rete.mem.StrategyOneMem
 import org.junit.Test
 
 class AdvancedRuleTest : RuleTestCommon() {

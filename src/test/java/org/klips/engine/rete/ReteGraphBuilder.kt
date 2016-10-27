@@ -6,7 +6,7 @@ import org.klips.engine.Binding
 import org.klips.engine.Modification
 import org.klips.engine.query.*
 import org.klips.engine.rete.builder.ReteBuilderStrategy
-import org.klips.engine.rete.builder.StrategyOneMem
+import org.klips.engine.rete.mem.StrategyOneMem
 import org.klips.engine.rete.builder.Trigger
 import org.jgrapht.DirectedGraph
 import org.jgrapht.graph.SimpleDirectedGraph

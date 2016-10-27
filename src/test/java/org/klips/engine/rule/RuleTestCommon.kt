@@ -6,7 +6,7 @@ import org.klips.dsl.substitute
 import org.klips.engine.Binding
 import org.klips.engine.Modification
 import org.klips.engine.rete.builder.RuleClause
-import org.klips.engine.rete.builder.StrategyOneMem
+import org.klips.engine.rete.mem.StrategyOneMem
 import org.klips.engine.rete.builder.Trigger
 
 open class RuleTestCommon {
