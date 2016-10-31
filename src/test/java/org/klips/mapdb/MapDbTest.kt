@@ -24,7 +24,7 @@ class MapDbTest {
         val db = DBMaker.memoryDB().make()
 
         // initialize multimap: Map<String,List<Integer>>
-        val multimap = db.treeSet("towns").serializer(SerializerArrayTuple(Serializer.STRING, Serializer.INTEGER))//set tuple serializer
+        val multimap = db.treeSet("towns").serializer(SerializerArrayTuple(Serializer.STRING, Serializer.INTEGER))//alphaBindings tuple serializer
                 .createOrOpen()
 
 // populate, key is first component in tuple (array), value is second

@@ -10,13 +10,13 @@ interface RHS : Asserter {
     val modified: List<Fact>
 
     /**
-     * This method is designed to flush facts into WM of other rule set.
+     * This method is designed to flush facts into WM of other rule alphaBindings.
      * One advantage from using standard [ReteInput.flush] is that
      * refs in aa asserted or retired facts are automatically substituted
      * with current solution of this RHS. Another feature is to use unary
      * operator '!' which is also sensitive to current solution.
      *
-     * If to use [ReteInput.flush] to pass facts to other rule set WM:
+     * If to use [ReteInput.flush] to pass facts to other rule alphaBindings WM:
      * ```
      * rule {
      *  +SomeFact(x,y)
@@ -28,7 +28,7 @@ interface RHS : Asserter {
      *  }
      * }
      * ```
-     * If to use [pass] to pass facts to other rule set WM:
+     * If to use [pass] to pass facts to other rule alphaBindings WM:
      * ```
      * rule {
      *  +SomeFact(x,y)

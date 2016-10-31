@@ -1,6 +1,7 @@
 package org.klips.engine
 
 import org.klips.dsl.Facet
+import org.klips.engine.util.SimpleEntry
 import kotlin.collections.Map.Entry
 
 
@@ -22,8 +23,4 @@ class SimpleBinding(private val data : Map<Facet<*>, Facet<*>>)  : Binding(){
     override fun containsValue(value: Facet<*>) = data.containsValue(value)
     override fun get(key: Facet<*>)             = data[key]
     override fun isEmpty()                      = data.isEmpty()
-
-//    fun put(k:Facet<*>, v:Facet<*>):Facet<*>?{
-//        return data.put(k, v)
-//    }
 }

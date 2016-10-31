@@ -17,11 +17,11 @@ import kotlin.properties.Delegates.notNull
  * This class defines a production rule. Such a rule have
  * its condition (LHS), additional constraint (guard) and effect (RHS).
  *
- * Condition is a pattern described by a set of facts with references
+ * Condition is a pattern described by a alphaBindings of facts with references
  * and constants. The pattern must be connected by references.
  *
  * The rule condition is evaluated against working memory of
- * a rule set to check whether it is activated. If rule become
+ * a rule alphaBindings to check whether it is activated. If rule become
  * active it is scheduled to trigger i.e. it is enqueued to the agenda.
  *
  * The agenda is a priority queue, where priority is a double value and

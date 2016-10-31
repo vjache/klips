@@ -6,7 +6,7 @@ import org.klips.engine.rete.mem.StrategyOneMem
 import org.klips.engine.util.Log
 
 /**
- * This abstract class is used to create a set of rules.
+ * This abstract class is used to create a alphaBindings of rules.
  * Create your own class as a subclass of this one and
  * define your rules e.g. in 'init{}' like this:
  * ```
@@ -42,7 +42,7 @@ abstract class RuleSet(val log: Log) : FacetBuilder() {
 
     /**
      * This property is used to apply modifications to the
-     * working memory of this rule set.
+     * working memory of this rule alphaBindings.
      * @see org.klips.engine.rete.ReteInput
      */
     val input: ReteInput

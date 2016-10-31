@@ -2,19 +2,18 @@ package org.klips.engine.query
 
 import org.klips.dsl.Facet
 import org.klips.engine.Binding
-import org.klips.engine.query.BindingSet
 import org.klips.engine.util.MappedIterator
-import java.util.*
 
-class SimpleBindingSet(
+class SimpleMappedBindingSet(
         override val refs:Set<Facet.FacetRef<*>>,
-        private val baseSet: Set<Binding>) :
+        private val baseSet: Set<Binding>,
+        private val mapper:(Binding) -> Binding) :
         BindingSet {
 
     override val size: Int
         get() = baseSet.size
 
     override fun isEmpty()  = baseSet.isEmpty()
-    override fun iterator() = baseSet.iterator()
+    override fun iterator() = MappedIterator(baseSet.iterator(), mapper)
 
 }

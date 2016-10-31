@@ -5,7 +5,7 @@ import org.klips.dsl.Facet.ConstFacet
 import org.klips.FacetNotBoundException
 import org.klips.ReferenceNotBoundException
 
-abstract class  Binding : Map<Facet<*>, Facet<*>>{
+abstract class  Binding : Map<Facet<*>, Facet<*>> {
     val refs: Set<Facet<*>>
         get() = keys
     val consts: Collection<Facet<*>>

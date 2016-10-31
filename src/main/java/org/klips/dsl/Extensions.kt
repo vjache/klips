@@ -14,7 +14,7 @@ fun rules(log: Log, init: RuleSet.() -> Unit): RuleSet {
 
 operator fun <T:Comparable<T>> Modification<Binding>.get(f: Facet<T>) = arg.fetchValue2(f)
 
-val <T:Comparable<T>> T.facet:Facet<T>
+val <T:Comparable<T>> T.facet:Facet.ConstFacet<T>
     get() = Facet.ConstFacet(this)
 
 val <T:Comparable<T>> Facet<T>.value:T

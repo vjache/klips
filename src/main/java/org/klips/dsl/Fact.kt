@@ -10,10 +10,10 @@ import kotlin.reflect.jvm.kotlinProperty
  * Fact is a class representing a data piece describing
  * some aspect of a state of a world. Conceptually fact
  * is equivalent to the relation from relational algebra
- * (database theory), and cognate to a relation from a set theory.
+ * (database theory), and cognate to a relation from a alphaBindings theory.
  *
  * To define rules, firstly one must define an application
- * domain. Technically this means that a set of subclasses
+ * domain. Technically this means that a alphaBindings of subclasses
  * of a [Fact] must be defined. Each [Fact] subclass must
  * have a primary constructor with properties of type [Facet].
  *
