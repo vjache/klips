@@ -54,10 +54,10 @@ class MemBetaNode(log: Log, l: Node, r: Node) : BetaNode(log, l, r) {
 
     override fun composeBinding(
             source: Node,
-            newBinding: Binding,
+            mdf: Modification<Binding>,
             cachedBinding: Binding) = when (source) {
-        left  -> ComposeBinding(newBinding, cachedBinding)
-        right -> ComposeBinding(cachedBinding, newBinding)
+        left  -> ComposeBinding(mdf.arg, cachedBinding)
+        right -> ComposeBinding(cachedBinding, mdf.arg)
         else  -> throw IllegalArgumentException()
     }
 //

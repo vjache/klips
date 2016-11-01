@@ -4,5 +4,5 @@ import org.klips.engine.Binding
 import org.mapdb.BTreeMap
 
 interface BindingDB {
-    val bindings : BTreeMap<Int, Binding>
+    fun fetchBinding(id:Int) : Binding
 }

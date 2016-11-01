@@ -2,6 +2,7 @@ package org.klips.dsl
 
 import org.klips.engine.rete.ReteInput
 import org.klips.engine.rete.builder.ReteBuilderStrategy
+import org.klips.engine.rete.builder.RuleClause
 import org.klips.engine.rete.mem.StrategyOneMem
 import org.klips.engine.util.Log
 
@@ -33,10 +34,13 @@ abstract class RuleSet(val log: Log) : FacetBuilder() {
     get() {
         if (field == null)
         {
-            field = StrategyOneMem(log, rules.map(Rule::toInternal))
+            field = createEngine(log, rules.map(Rule::toInternal))
         }
         return field
     }
+
+    open protected fun createEngine(log: Log, rules: List<RuleClause>):ReteBuilderStrategy =
+            StrategyOneMem(log, rules)
 
     private var defaultPrioClock = 0.0
 

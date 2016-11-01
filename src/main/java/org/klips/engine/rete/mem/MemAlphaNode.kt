@@ -17,6 +17,7 @@ class MemAlphaNode(log: Log, pattern:Fact) : AlphaNode(log, pattern) {
             is Assert -> {
                 if(binding in set)
                     return null
+                println("modify cache: $mdf")
                 set.add(binding)
                 return binding
             }

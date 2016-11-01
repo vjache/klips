@@ -8,20 +8,23 @@ import org.mapdb.BTreeMap
 import org.mapdb.Serializer
 import java.util.concurrent.atomic.AtomicInteger
 
-class AlphaNodeMapDB(strategy: StrategyOneMapDB, f1: Fact) : AlphaNode(strategy.log, f1), BindingDB {
-    override val bindings: BTreeMap<Int, Binding>
-        get() = alphaBindingsRev
+class AlphaNodeMapDB(val strategy: StrategyOneMapDB, f1: Fact) : AlphaNode(strategy.log, f1), BindingDB {
+    override fun fetchBinding(id: Int) = BindingMapDB(id,alphaBindingsRev[id]!!)
 
-    val rId = strategy.rIds.andIncrement
+    val rId:Int by lazy { strategy.rIds.andIncrement }
 
-    private val alphaBindings:BTreeMap<Binding, Int> = strategy.db.treeMap(
-            "a-node_db_$rId",
-            BindingSerializer(f1.refs, strategy.tupleFactory),
-            Serializer.INTEGER).createOrOpen()
-    private val alphaBindingsRev:BTreeMap<Int, Binding> = strategy.db.treeMap(
-            "a-node_db_rev_$rId",
-            Serializer.INTEGER,
-            BindingSerializer(f1.refs, strategy.tupleFactory)).createOrOpen()
+    private val alphaBindings:BTreeMap<Binding, Int> by lazy {
+        strategy.db.treeMap(
+                "a-node_db_$rId",
+                BindingSerializer(f1.refs, strategy.tupleFactory),
+                Serializer.INTEGER).createOrOpen()
+    }
+    private val alphaBindingsRev:BTreeMap<Int, Binding> by lazy {
+        strategy.db.treeMap(
+                "a-node_db_rev_$rId",
+                Serializer.INTEGER,
+                BindingSerializer(f1.refs, strategy.tupleFactory)).createOrOpen()
+    }
     private val ids = AtomicInteger(0) // bindings ids
 
     override fun modifyCache(mdf: Modification<out Binding>): Binding? {

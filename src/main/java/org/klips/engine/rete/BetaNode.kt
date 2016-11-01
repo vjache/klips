@@ -54,7 +54,7 @@ abstract class BetaNode : Node, Consumer {
 
     protected abstract fun composeBinding(
             source: Node,
-            newBinding: Binding,
+            mdf: Modification<Binding>,
             cachedBinding: Binding): Binding
 
     fun other(n: Node) = when (n) {
@@ -91,7 +91,7 @@ abstract class BetaNode : Node, Consumer {
                     val hcs = "[${hashCode()}:${left.hashCode()},${right.hashCode()}()]"
                     "JOIN HAPPEN(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t${patt2.substitute(it)}"
                 }
-                notifyConsumers(mdf.inherit(composeBinding(source, binding, it)))
+                notifyConsumers(mdf.inherit(composeBinding(source, mdf, it)))
             }
         }
     }

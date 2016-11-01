@@ -11,7 +11,7 @@ import org.klips.engine.util.activationHappen
 import kotlin.collections.Map.Entry
 
 
-class ProxyNode(log:Log, node: Node, val renamingBinding: Binding) : Node(log), Consumer {
+abstract class ProxyNode(log:Log, node: Node, val renamingBinding: Binding) : Node(log), Consumer {
 
     var node: Node = node
     set(value) {
@@ -42,8 +42,10 @@ class ProxyNode(log:Log, node: Node, val renamingBinding: Binding) : Node(log), 
             activationHappen()
             "P-CONSUME: $mdf, $this"
         }
-        notifyConsumers(mdf.inherit(ProxyBinding(mdf.arg)))
+        notifyConsumers(mdf.inherit(proxifyBinding(mdf.arg)))
     }
+
+    protected abstract fun proxifyBinding(former: Binding):Binding
 
     override fun toString() = "P-Node($refs) [${System.identityHashCode(this)}]"
 

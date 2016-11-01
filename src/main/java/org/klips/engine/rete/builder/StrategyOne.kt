@@ -135,7 +135,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
             // TODO : make p-node pass refs unchanged when no renaming mapping
             val group = unifiedPatterns.second[i].group
             val prio  = unifiedPatterns.second[i].priority
-            val proxyNode = ProxyNode(log, node, rbinding)
+            val proxyNode = createProxyNode(node, rbinding)
             proxyNode.addConsumer(object : Consumer {
                 override fun consume(source:
                                      Node, mdf: Modification<Binding>) {
@@ -166,7 +166,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
         val nodes0 = mutableSetOf<Node>().apply {
             workGraphs.forEach { wg -> addAll(wg.second.vertexSet()) }
         }
-        allNodes = nodes0.subtract(Optimizer(log).optimize(nodes0))
+        allNodes = nodes0.subtract(Optimizer(this).optimize(nodes0))
 
         alphaLayer = mutableSetOf<AlphaNode>().apply {
             allNodes.forEach {
@@ -219,6 +219,7 @@ abstract class StrategyOne(val log: Log, patterns: List<RuleClause>) :
                         else Pair(l, r)
                     })
 
-    abstract protected fun createBetaNode(f1: Node, f2: Node): BetaNode
-    abstract protected fun createAlphaNode(f1: Fact): AlphaNode
+    abstract internal fun createBetaNode(f1: Node, f2: Node): BetaNode
+    abstract internal fun createAlphaNode(f1: Fact): AlphaNode
+    abstract internal fun createProxyNode(node:Node, renamingData:Binding):ProxyNode
 }
