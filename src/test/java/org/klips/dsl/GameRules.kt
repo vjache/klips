@@ -17,7 +17,7 @@ import org.klips.mapdb.TestDomainTupleFactory
 import java.lang.Math.*
 import kotlin.test.assertFailsWith
 
-class GameRules(log:Log = Log()) : RuleSet(log) {
+open class GameRules(log:Log = Log(workingMemory = true, agenda = true)) : RuleSet(log) {
 
     val triggered = mutableListOf<String>()
 
@@ -38,9 +38,9 @@ class GameRules(log:Log = Log()) : RuleSet(log) {
     val state = ref<State>("state")
     val state1 = ref<State>("state1")
 
-    override fun createEngine(log: Log, rules: List<RuleClause>): ReteBuilderStrategy {
-        return StrategyOneMapDB(TestDomainTupleFactory(), log, rules)
-    }
+//    override fun createEngine(log: Log, rules: List<RuleClause>): ReteBuilderStrategy {
+//        return StrategyOneMapDB(TestDomainTupleFactory(), log, rules)
+//    }
 
     init {
 

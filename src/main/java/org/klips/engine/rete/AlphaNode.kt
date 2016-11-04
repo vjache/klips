@@ -19,25 +19,23 @@ abstract class AlphaNode(log: Log, val pattern: Fact) : Node(log) {
 
     fun accept(mdf: Modification<out Fact>): Boolean {
         matcher.bind(mdf.arg)?.let { b0 ->
-            val b1 = modifyCache(mdf.inherit(b0))
-            if (b1 == null) {
-                log.reteEvent {
-                    activationFailed()
-                    "ACCEPT IDLE: $mdf, $this"
-                }
-            } else {
+            val modified = modifyCache(mdf.inherit(b0)) { b1 ->
                 log.reteEvent {
                     activationHappen()
                     "ACCEPT HAPPEN: $mdf, $this"
                 }
                 notifyConsumers(mdf.inherit(b1))
             }
+            if (!modified) log.reteEvent {
+                activationFailed()
+                "ACCEPT IDLE: $mdf, $this"
+            }
             return true
         }
         return false
     }
 
-    abstract protected fun modifyCache(mdf: Modification<out Binding>): Binding?
+    abstract protected fun modifyCache(mdf: Modification<out Binding>, hookModify: (Binding) -> Unit): Boolean
 
     ////////////////////////////////////////////////////////
 //

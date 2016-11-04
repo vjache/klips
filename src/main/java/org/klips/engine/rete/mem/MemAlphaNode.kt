@@ -11,21 +11,20 @@ import java.util.*
 
 class MemAlphaNode(log: Log, pattern:Fact) : AlphaNode(log, pattern) {
     private val set = HashSet<Binding>()
-    override fun modifyCache(mdf: Modification<out Binding>): Binding? {
+    override fun modifyCache(mdf: Modification<out Binding>, hookModify: (Binding) -> Unit): Boolean {
         val binding = mdf.arg
         when(mdf) {
             is Assert -> {
-                if(binding in set)
-                    return null
-                println("modify cache: $mdf")
+                if(binding in set) return false
+                hookModify(binding)
                 set.add(binding)
-                return binding
+                return true
             }
             is Retire -> {
-                if(binding !in set)
-                    return null
+                if(binding !in set) return false
+                hookModify(binding)
                 set.remove(binding)
-                return binding
+                return true
             }
         }
     }

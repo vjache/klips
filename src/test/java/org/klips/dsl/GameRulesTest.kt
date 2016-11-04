@@ -10,11 +10,13 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-class GameRulesTest {
+open class GameRulesTest {
+
+    protected open fun createGameRules() = GameRules()
 
     @Test
     fun createCommand() {
-        GameRules().input.flush("CreateAgent") {
+        createGameRules().input.flush("CreateAgent") {
             +Adjacent(2, 1)
             +At(100, 1)
             +Actor(100, 1000, Aim, 100f, 100f, Deployed)
@@ -25,7 +27,7 @@ class GameRulesTest {
 
     @Test
     fun moveCommand() {
-        GameRules().input.flush("Move") {
+        createGameRules().input.flush("Move") {
             +Adjacent(2, 1)
             +At(100, 1)
             +Actor(100, 1000, Aim, 7f, 100f, OnMarch)
@@ -36,7 +38,7 @@ class GameRulesTest {
 
     @Test
     fun attackCommand() {
-        GameRules().input.flush("Attack") {
+        createGameRules().input.flush("Attack") {
             +AttackCommand(ActorId(100).facet, ActorId(101).facet)
             +At(ActorId(100).facet, CellId(1).facet)
             +Adjacent(CellId(1).facet, CellId(2).facet)
@@ -48,7 +50,7 @@ class GameRulesTest {
 
     @Test
     fun deployCommand() {
-        GameRules().input.flush("Deploy") {
+        createGameRules().input.flush("Deploy") {
             +DeployCommand(ActorId(100).facet)
             +Actor(100, 1000, ActorKind.Guard, 10f, 100f, OnMarch)
         }
@@ -56,7 +58,7 @@ class GameRulesTest {
 
     @Test
     fun undeployCommand() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("Undeploy") {
                 +UndeployCommand(ActorId(100).facet)
@@ -71,7 +73,7 @@ class GameRulesTest {
 
     @Test
     fun chargeCommand() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("Charge") {
                 +ChargeCommand(ActorId(100).facet, ActorId(101).facet)
@@ -90,7 +92,7 @@ class GameRulesTest {
 
     @Test
     fun repairCommand() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("Repair") {
                 +RepairCommand(ActorId(100).facet, ActorId(101).facet)
@@ -109,7 +111,7 @@ class GameRulesTest {
 
     @Test
     fun scrapCommand() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("Scrap") {
                 +ScrapCommand(ActorId(100).facet, ActorId(101).facet)
@@ -128,7 +130,7 @@ class GameRulesTest {
 
     @Test
     fun feedAimCommand() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("FeedAim") {
                 +FeedAimCommand(ActorId(100).facet, ActorId(101).facet)
@@ -147,7 +149,7 @@ class GameRulesTest {
 
     @Test
     fun passiveSolarChargeOnNewTurn() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("TurnStart.Solar.Charge") {
                 +Turn(PlayerId(1000).facet)
@@ -162,7 +164,7 @@ class GameRulesTest {
 
     @Test
     fun commFieldOnMarche() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("Comm.Field.OnMarche") {
                 +Actor(100, 1000, ActorKind.Comm, 10f, 100f, OnMarch)
@@ -183,7 +185,7 @@ class GameRulesTest {
 
     @Test
     fun commFieldDeployed() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("Comm.Field.Deployed") {
                 +Actor(100, 1000, ActorKind.Comm, 10f, 100f, Deployed)
@@ -204,7 +206,7 @@ class GameRulesTest {
 
     @Test
     fun guardHealthInterchange() {
-        val gameRules = GameRules()
+        val gameRules = createGameRules()
         try {
             gameRules.input.flush("Guards.Health.Interchange") {
                 +Turn(PlayerId(1000).facet)
@@ -224,7 +226,7 @@ class GameRulesTest {
     @Test
     fun refNotBound() {
         assertFailsWith<ReferenceNotBoundException> {
-            val gameRules = GameRules()
+            val gameRules = createGameRules()
             gameRules.input.flush("RefNotBound.Exception") {
                 +Actor(171717, 1000, ActorKind.Guard, 10f, 20f, Deployed)
             }
@@ -233,7 +235,7 @@ class GameRulesTest {
 
     @Test
     fun ruleConcurrency() {
-        val g = GameRules()
+        val g = createGameRules()
         g.input.flush() {
             +Actor(151515, 1000, ActorKind.Guard, 10f, 20f, Deployed)
             +MoveCommand(ActorId(151515).facet, CellId(101010).facet)
@@ -244,7 +246,7 @@ class GameRulesTest {
 
     @Test
     fun ruleConcurrency2() {
-        val g = GameRules()
+        val g = createGameRules()
         g.input.flush() {
             +Actor(161616, 109109109, ActorKind.Guard, 10f, 20f, Deployed)
             +RepairCommand(ActorId(161616).facet, ActorId(161617).facet)

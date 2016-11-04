@@ -17,7 +17,8 @@ class MemBetaNode(log: Log, l: Node, r: Node) : BetaNode(log, l, r) {
     private val leftIndex  = HashMap<Binding, HashSet<Binding>>()
     private val rightIndex = HashMap<Binding, HashSet<Binding>>()
 
-    override fun modifyIndex(source: Node, key: Binding, mdf: Modification<Binding>): Boolean {
+    override fun modifyIndex(source: Node, key: Binding, mdf: Modification<Binding>,
+                             hookModify:() -> Unit): Boolean {
         val values = when (source) {
             left  -> leftIndex
             right -> rightIndex
@@ -30,6 +31,7 @@ class MemBetaNode(log: Log, l: Node, r: Node) : BetaNode(log, l, r) {
                     return false
                 else {
                     values.add(value)
+                    hookModify()
                     return true
                 }
             }
@@ -37,6 +39,7 @@ class MemBetaNode(log: Log, l: Node, r: Node) : BetaNode(log, l, r) {
                 if (value !in values)
                     return false
                 else {
+                    hookModify()
                     values.remove(value)
                     return true
                 }

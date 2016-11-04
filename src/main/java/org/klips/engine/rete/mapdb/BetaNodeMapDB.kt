@@ -6,6 +6,8 @@ import org.klips.dsl.ref
 import org.klips.engine.Binding
 import org.klips.engine.ComposeBinding
 import org.klips.engine.Modification
+import org.klips.engine.Modification.Assert
+import org.klips.engine.Modification.Retire
 import org.klips.engine.SingletonBinding
 import org.klips.engine.query.BindingSet
 import org.klips.engine.query.SimpleMappedBindingSet
@@ -46,7 +48,7 @@ class BetaNodeMapDB(strategy: StrategyOneMapDB, f1: Node, f2: Node) : BetaNode(s
                 BindingSerializer(refs, strategy.tupleFactory)).createOrOpen()
     }
 
-    override fun fetchBinding(id: Int) = bindings[id]!!
+    override fun fetchBinding(id: Int) = BindingMapDB(id, bindings[id]!!)
 
     val bindingsRev: BTreeMap<Binding, Int> by lazy {
         strategy.db.treeMap(
@@ -55,13 +57,25 @@ class BetaNodeMapDB(strategy: StrategyOneMapDB, f1: Node, f2: Node) : BetaNode(s
                 Serializer.INTEGER).createOrOpen()
     }
 
-    override fun modifyIndex(source: Node, key: Binding, mdf: Modification<Binding>): Boolean {
+    override fun modifyIndex(source: Node, key: Binding, mdf: Modification<Binding>,
+                             hookModify:() -> Unit): Boolean {
         val bId = (mdf.arg as BindingMapDB).dbId
-        return when (source) {
+        val index = when (source) {
             left -> leftIndex
             right -> rightIndex
             else -> throw IllegalArgumentException("Bad source: $source")
-        }.add(ComposeBinding(key, SingletonBinding(bIdRef to bId.facet)))
+        }
+        return when(mdf){
+            is Assert -> {
+                hookModify()
+                index.add(ComposeBinding(key, SingletonBinding(bIdRef to bId.facet)))
+            }
+            is Retire -> {
+                val modified = index.remove(ComposeBinding(key, SingletonBinding(bIdRef to bId.facet)))
+                hookModify()
+                modified
+            }
+        }
     }
 
     override fun lookupIndex(source: Node, key: Binding): BindingSet {
@@ -91,14 +105,14 @@ class BetaNodeMapDB(strategy: StrategyOneMapDB, f1: Node, f2: Node) : BetaNode(s
 
         val bId:Int
         when (mdf) {
-            is Modification.Assert -> {
+            is Assert -> {
                 bId = ids.andIncrement
                 bindings.putIfAbsent(bId, binding)?.let {
                     throw IllegalStateException()
                 }
                 bindingsRev.putIfAbsent(binding, bId)
             }
-            is Modification.Retire -> {
+            is Retire -> {
                 bId = bindingsRev.remove(binding)!!
                 bindings.remove(bId, binding)
             }

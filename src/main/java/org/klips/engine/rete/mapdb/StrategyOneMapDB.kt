@@ -29,7 +29,7 @@ class StrategyOneMapDB (val tupleFactory: TupleFactory?, log: Log, patterns: Lis
         return AlphaNodeMapDB(this, f1)
     }
 
-    override fun createProxyNode(node: Node, renamingData: Binding):ProxyNode = object : ProxyNode(log, node, renamingData),BindingDB{
+    override fun createProxyNode(node: Node, renamingData: Binding):ProxyNode = object : ProxyNode(log, node, renamingData), BindingDB{
         override fun fetchBinding(id: Int) = proxifyBinding((node as BindingDB).fetchBinding(id))
 
         override fun proxifyBinding(former: Binding): Binding {

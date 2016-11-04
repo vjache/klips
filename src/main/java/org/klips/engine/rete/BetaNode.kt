@@ -46,7 +46,8 @@ abstract class BetaNode : Node, Consumer {
     protected abstract fun modifyIndex(
             source: Node,
             key: Binding,
-            mdf: Modification<Binding>): Boolean
+            mdf: Modification<Binding>,
+            hookModify:() -> Unit): Boolean
 
     protected abstract fun lookupIndex(
             source: Node,
@@ -70,14 +71,14 @@ abstract class BetaNode : Node, Consumer {
     override fun consume(source: Node, mdf: Modification<Binding>) {
         val binding = mdf.arg
         val key = makeKey(binding)
-        if (modifyIndex(source, key, mdf)) {
+        modifyIndex(source, key, mdf){
             val lookupResults = lookupIndex(otherSource(source), key)
-            dbg.cnt.andIncrement
-            val patt1 = collectPattern(source)
-            val patt2 = collectPattern(other(source))
 
             log.reteEvent {
                 if (lookupResults.size == 0) {
+                    dbg.cnt.andIncrement
+                    val patt1 = collectPattern(source)
+                    val patt2 = collectPattern(other(source))
                     activationFailed()
                     val hcs = "[${hashCode()}:${left.hashCode()},${right.hashCode()}()]"
                     "JOIN FAIL(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t$patt2"
@@ -87,6 +88,9 @@ abstract class BetaNode : Node, Consumer {
             val lookupResultsCopy = lookupResults.map { it }
             lookupResultsCopy.forEach {
                 log.reteEvent {
+                    dbg.cnt.andIncrement
+                    val patt1 = collectPattern(source)
+                    val patt2 = collectPattern(other(source))
                     activationHappen()
                     val hcs = "[${hashCode()}:${left.hashCode()},${right.hashCode()}()]"
                     "JOIN HAPPEN(${dbg.cnt})$hcs: \n\t$key\n\t${patt1.substitute(mdf.arg)}\n\t${patt2.substitute(it)}"
