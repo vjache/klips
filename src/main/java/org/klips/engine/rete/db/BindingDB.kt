@@ -1,9 +1,9 @@
-package org.klips.engine.rete.mapdb
+package org.klips.engine.rete.db
 
 import org.klips.dsl.Facet
 import org.klips.engine.Binding
 
-class BindingMapDB(val dbId: Int, val base:Binding) : Binding(){
+class BindingDB(val dbId: Int, val base:Binding) : Binding(){
     override val entries: Set<Map.Entry<Facet<*>, Facet<*>>>
         get() = base.entries
     override val keys: Set<Facet<*>>

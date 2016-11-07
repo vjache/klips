@@ -1,9 +1,9 @@
-package org.klips.mapdb
+package org.klips.db
 
 import org.klips.engine.*
-import org.klips.engine.rete.mapdb.TupleFactory
+import org.klips.engine.rete.db.TupleFactoryDB
 
-class TestDomainTupleFactory : TupleFactory {
+class TestDomainTupleFactory : TupleFactoryDB {
     override fun createTuple(typeCode: Int, args: Array<Any>): Any = when (typeCode) {
         0 -> CellId(args.first() as Int)
         1 -> ActorId(args.first() as Int)

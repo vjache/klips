@@ -1,5 +1,6 @@
-package org.klips.engine.rete.mapdb
+package org.klips.engine.rete.db
 
+import org.klips.db.Serializer
 import org.klips.dsl.Facet.ConstFacet
 import org.klips.dsl.facet
 import org.klips.dsl.ref
@@ -13,14 +14,13 @@ import org.klips.engine.query.BindingSet
 import org.klips.engine.query.SimpleMappedBindingSet
 import org.klips.engine.rete.BetaNode
 import org.klips.engine.rete.Node
+import org.klips.engine.util.putIfAbsent
 import org.klips.engine.util.to
-import org.mapdb.BTreeMap
-import org.mapdb.Serializer
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 @Suppress("UNCHECKED_CAST")
-class BetaNodeMapDB(strategy: StrategyOneMapDB, f1: Node, f2: Node) : BetaNode(strategy.log, f1, f2), BindingDB {
+class BetaNodeDB(strategy: StrategyOneDB, f1: Node, f2: Node) : BetaNode(strategy.log, f1, f2), BindingRepo {
 
     val rId by lazy { strategy.rIds.andIncrement }
 
@@ -29,37 +29,43 @@ class BetaNodeMapDB(strategy: StrategyOneMapDB, f1: Node, f2: Node) : BetaNode(s
     private val bIdRef = ref<Int>("##BINDING_ID##")
     private val indexRefs = commonRefs.toList().plus(bIdRef)
 
-    private val leftIndex: NavigableSet<Binding> by lazy {
-        strategy.db.treeSet(
+    private val leftIndex: NavigableMap<Binding, MutableSet<Binding>> by lazy {
+        strategy.db.openMultiMap(
                 "b-node_db_left_$rId",
-                BindingSerializer(indexRefs, strategy.tupleFactory)).createOrOpen()
+                BindingComparator(indexRefs),
+                BindingSerializerDB(indexRefs, strategy.tupleFactory),
+                BindingSerializerDB(f1.refs, strategy.tupleFactory))
     }
 
-    private val rightIndex: NavigableSet<Binding> by lazy {
-        strategy.db.treeSet(
+    private val rightIndex: NavigableMap<Binding, MutableSet<Binding>> by lazy {
+        strategy.db.openMultiMap(
                 "b-node_db_right_$rId",
-                BindingSerializer(indexRefs, strategy.tupleFactory)).createOrOpen()
+                BindingComparator(indexRefs),
+                BindingSerializerDB(indexRefs, strategy.tupleFactory),
+                BindingSerializerDB(f2.refs, strategy.tupleFactory))
     }
 
-    private val bindings: BTreeMap<Int, Binding> by lazy {
-        strategy.db.treeMap(
+    private val bindings: NavigableMap<Int, Binding> by lazy {
+        strategy.db.openMap(
                 "b-node_db_cache_$rId",
-                Serializer.INTEGER,
-                BindingSerializer(refs, strategy.tupleFactory)).createOrOpen()
+                Comparator { t1, t2 -> t1 - t2 },
+                Serializer.INT,
+                BindingSerializerDB(refs, strategy.tupleFactory))
     }
 
-    override fun fetchBinding(id: Int) = BindingMapDB(id, bindings[id]!!)
+    override fun fetchBinding(id: Int) = BindingDB(id, bindings[id]!!)
 
-    val bindingsRev: BTreeMap<Binding, Int> by lazy {
-        strategy.db.treeMap(
+    val bindingsRev: NavigableMap<Binding, Int> by lazy {
+        strategy.db.openMap(
                 "b-node_db_cache_rev_$rId",
-                BindingSerializer(refs, strategy.tupleFactory),
-                Serializer.INTEGER).createOrOpen()
+                BindingComparator(refs),
+                BindingSerializerDB(refs, strategy.tupleFactory),
+                Serializer.INT)
     }
 
     override fun modifyIndex(source: Node, key: Binding, mdf: Modification<Binding>,
                              hookModify:() -> Unit): Boolean {
-        val bId = (mdf.arg as BindingMapDB).dbId
+        val bId = (mdf.arg as BindingDB).dbId
         val index = when (source) {
             left -> leftIndex
             right -> rightIndex
@@ -68,10 +74,10 @@ class BetaNodeMapDB(strategy: StrategyOneMapDB, f1: Node, f2: Node) : BetaNode(s
         return when(mdf){
             is Assert -> {
                 hookModify()
-                index.add(ComposeBinding(key, SingletonBinding(bIdRef to bId.facet)))
+                index[key]!!.add(SingletonBinding(bIdRef to bId.facet))
             }
             is Retire -> {
-                val modified = index.remove(ComposeBinding(key, SingletonBinding(bIdRef to bId.facet)))
+                val modified = index[key]!!.remove(SingletonBinding(bIdRef to bId.facet))
                 hookModify()
                 modified
             }
@@ -79,18 +85,15 @@ class BetaNodeMapDB(strategy: StrategyOneMapDB, f1: Node, f2: Node) : BetaNode(s
     }
 
     override fun lookupIndex(source: Node, key: Binding): BindingSet {
-        fun NavigableSet<Binding>.subSet() = subSet(
-                ComposeBinding(key, SingletonBinding(bIdRef to Int.MIN_VALUE.facet)),
-                ComposeBinding(key, SingletonBinding(bIdRef to Int.MAX_VALUE.facet)))
 
         return when (source) {
-            left -> SimpleMappedBindingSet(left.refs, leftIndex.subSet()) {
+            left -> SimpleMappedBindingSet(left.refs, leftIndex[key]!!) {
                 val bId = (it[bIdRef] as ConstFacet<Int>).value
-                (left as BindingDB).fetchBinding(bId)
+                (left as BindingRepo).fetchBinding(bId)
             }
-            right -> SimpleMappedBindingSet(right.refs, rightIndex.subSet()) {
+            right -> SimpleMappedBindingSet(right.refs, rightIndex[key]!!) {
                 val bId = (it[bIdRef] as ConstFacet<Int>).value
-                (right as BindingDB).fetchBinding(bId)
+                (right as BindingRepo).fetchBinding(bId)
             }
             else -> throw IllegalArgumentException("Bad source: $source")
         }
@@ -114,11 +117,11 @@ class BetaNodeMapDB(strategy: StrategyOneMapDB, f1: Node, f2: Node) : BetaNode(s
             }
             is Retire -> {
                 bId = bindingsRev.remove(binding)!!
-                bindings.remove(bId, binding)
+                bindings.remove(bId)
             }
             else -> throw IllegalArgumentException()
         }
 
-        return BindingMapDB(bId, binding)
+        return BindingDB(bId, binding)
     }
 }

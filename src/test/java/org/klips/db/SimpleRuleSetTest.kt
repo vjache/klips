@@ -1,11 +1,11 @@
-package org.klips.mapdb
+package org.klips.db
 
 import org.junit.Test
 import org.klips.dsl.*
 import org.klips.engine.*
 import org.klips.engine.rete.builder.ReteBuilderStrategy
 import org.klips.engine.rete.builder.RuleClause
-import org.klips.engine.rete.mapdb.StrategyOneMapDB
+import org.klips.engine.rete.db.StrategyOneDB
 import org.klips.engine.util.Log
 import kotlin.test.assertNotNull
 
@@ -54,7 +54,7 @@ class SimpleRuleSetTest : RuleSet(Log()) {
     }
 
     override fun createEngine(log: Log, rules: List<RuleClause>): ReteBuilderStrategy {
-        return StrategyOneMapDB(TestDomainTupleFactory(), log, rules)
+        return StrategyOneDB(DatabaseImpl(), TestDomainTupleFactory(), log, rules)
     }
 
     @Test

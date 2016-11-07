@@ -1,13 +1,14 @@
-package org.klips.engine.rete.mapdb
+package org.klips.engine.rete.db
 
-import org.mapdb.DataInput2
-import org.mapdb.DataOutput2
-import org.mapdb.Serializer
+import org.klips.db.Serializer
+import java.io.DataInput
+import java.io.DataOutput
 
-abstract class ValueSerializer() : Serializer<Any> {
-    abstract fun deserializeEx(typeCodeRaw: Int, input: DataInput2, available: Int): Any
-    abstract fun serializeEx(output: DataOutput2, tuple: Any)
-    override fun deserialize(input: DataInput2, available: Int): Any {
+
+abstract class ValueSerializerDB() : Serializer<Any> {
+    abstract fun deserializeEx(typeCodeRaw: Int, input: DataInput): Any
+    abstract fun serializeEx(output: DataOutput, tuple: Any)
+    override fun deserialize(input: DataInput): Any {
         val typeCode = input.readByte().toInt()
         return when (typeCode) {
             1 -> input.readInt()
@@ -17,11 +18,11 @@ abstract class ValueSerializer() : Serializer<Any> {
             5 -> input.readUTF()
             6 -> input.readBoolean()
             7 -> input.readByte()
-            else -> deserializeEx(typeCode, input, available)
+            else -> deserializeEx(typeCode, input)
         }
     }
 
-    override fun serialize(output: DataOutput2, value: Any) {
+    override fun serialize(output: DataOutput, value: Any) {
         when (value) {
             is Int -> {
                 output.writeByte(1)

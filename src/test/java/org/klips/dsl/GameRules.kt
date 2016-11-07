@@ -9,11 +9,7 @@ import org.klips.engine.Modification.Assert
 import org.klips.engine.Modification.Retire
 import org.klips.engine.State.Deployed
 import org.klips.engine.State.OnMarch
-import org.klips.engine.rete.builder.ReteBuilderStrategy
-import org.klips.engine.rete.builder.RuleClause
-import org.klips.engine.rete.mapdb.StrategyOneMapDB
 import org.klips.engine.util.Log
-import org.klips.mapdb.TestDomainTupleFactory
 import java.lang.Math.*
 import kotlin.test.assertFailsWith
 
@@ -39,7 +35,7 @@ open class GameRules(log:Log = Log(workingMemory = true, agenda = true)) : RuleS
     val state1 = ref<State>("state1")
 
 //    override fun createEngine(log: Log, rules: List<RuleClause>): ReteBuilderStrategy {
-//        return StrategyOneMapDB(TestDomainTupleFactory(), log, rules)
+//        return StrategyOneDB(TestDomainTupleFactory(), log, rules)
 //    }
 
     init {

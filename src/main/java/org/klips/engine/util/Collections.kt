@@ -63,3 +63,13 @@ abstract class AbstractCollection<E>() : Collection<E> {
 
     override fun isEmpty(): Boolean = collection.isEmpty()
 }
+
+fun <K,V> MutableMap<K,V>.putIfAbsent(key:K, vlaue:V): V? {
+    val v = get(key)
+    if(v == null){
+        put(key, vlaue)
+        return null
+    } else {
+        return v
+    }
+}
