@@ -1,6 +1,6 @@
 package org.klips.engine.rete.db
 
-import org.klips.db.Serializer
+import org.klips.engine.rete.db.Serializer
 import org.klips.dsl.Facet.ConstFacet
 import org.klips.dsl.facet
 import org.klips.dsl.ref
@@ -29,7 +29,7 @@ class BetaNodeDB(strategy: StrategyOneDB, f1: Node, f2: Node) : BetaNode(strateg
     private val bIdRef = ref<Int>("##BINDING_ID##")
     private val indexRefs = commonRefs.toList().plus(bIdRef)
 
-    private val leftIndex: NavigableMap<Binding, MutableSet<Binding>> by lazy {
+    private val leftIndex: MutableMap<Binding, MutableSet<Binding>> by lazy {
         strategy.db.openMultiMap(
                 "b-node_db_left_$rId",
                 BindingComparator(indexRefs),
@@ -37,7 +37,7 @@ class BetaNodeDB(strategy: StrategyOneDB, f1: Node, f2: Node) : BetaNode(strateg
                 BindingSerializerDB(f1.refs, strategy.tupleFactory))
     }
 
-    private val rightIndex: NavigableMap<Binding, MutableSet<Binding>> by lazy {
+    private val rightIndex: MutableMap<Binding, MutableSet<Binding>> by lazy {
         strategy.db.openMultiMap(
                 "b-node_db_right_$rId",
                 BindingComparator(indexRefs),
@@ -45,7 +45,7 @@ class BetaNodeDB(strategy: StrategyOneDB, f1: Node, f2: Node) : BetaNode(strateg
                 BindingSerializerDB(f2.refs, strategy.tupleFactory))
     }
 
-    private val bindings: NavigableMap<Int, Binding> by lazy {
+    private val bindings: MutableMap<Int, Binding> by lazy {
         strategy.db.openMap(
                 "b-node_db_cache_$rId",
                 Comparator { t1, t2 -> t1 - t2 },
@@ -55,7 +55,7 @@ class BetaNodeDB(strategy: StrategyOneDB, f1: Node, f2: Node) : BetaNode(strateg
 
     override fun fetchBinding(id: Int) = BindingDB(id, bindings[id]!!)
 
-    val bindingsRev: NavigableMap<Binding, Int> by lazy {
+    val bindingsRev: MutableMap<Binding, Int> by lazy {
         strategy.db.openMap(
                 "b-node_db_cache_rev_$rId",
                 BindingComparator(refs),

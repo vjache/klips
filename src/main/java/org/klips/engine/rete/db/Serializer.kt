@@ -1,4 +1,4 @@
-package org.klips.db
+package org.klips.engine.rete.db
 
 import java.io.DataInput
 import java.io.DataOutput

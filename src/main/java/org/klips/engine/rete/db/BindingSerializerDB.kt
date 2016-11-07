@@ -1,6 +1,6 @@
 package org.klips.engine.rete.db
 
-import org.klips.db.Serializer
+import org.klips.engine.rete.db.Serializer
 import org.klips.dsl.Facet
 import org.klips.dsl.Facet.ConstFacet
 import org.klips.dsl.facet

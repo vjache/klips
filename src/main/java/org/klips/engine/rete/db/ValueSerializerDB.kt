@@ -1,6 +1,6 @@
 package org.klips.engine.rete.db
 
-import org.klips.db.Serializer
+import org.klips.engine.rete.db.Serializer
 import java.io.DataInput
 import java.io.DataOutput
 

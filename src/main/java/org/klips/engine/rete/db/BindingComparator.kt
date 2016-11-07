@@ -4,9 +4,7 @@ import org.klips.dsl.Facet
 import org.klips.engine.Binding
 import java.util.*
 
-/**
- * Created by vj on 07.11.16.
- */
+
 class BindingComparator(val refs: Collection<Facet.FacetRef<*>>) :Comparator<Binding> {
     override fun compare(first: Binding?, second: Binding?): Int {
         if (first === second) return 0

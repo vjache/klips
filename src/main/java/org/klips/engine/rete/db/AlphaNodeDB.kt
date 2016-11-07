@@ -1,6 +1,6 @@
 package org.klips.engine.rete.db
 
-import org.klips.db.Serializer
+import org.klips.engine.rete.db.Serializer
 import org.klips.dsl.Fact
 import org.klips.engine.Binding
 import org.klips.engine.Modification
@@ -17,14 +17,14 @@ class AlphaNodeDB(val strategy: StrategyOneDB, f1: Fact) : AlphaNode(strategy.lo
 
     val rId:Int by lazy { strategy.rIds.andIncrement }
 
-    private val alphaBindings:NavigableMap<Binding, Int> by lazy {
+    private val alphaBindings:MutableMap<Binding, Int> by lazy {
         strategy.db.openMap(
                 "a-node_db_$rId",
                 BindingComparator(f1.refs),
                 BindingSerializerDB(f1.refs, strategy.tupleFactory),
                 Serializer.INT)
     }
-    private val alphaBindingsRev:NavigableMap<Int, Binding> by lazy {
+    private val alphaBindingsRev:MutableMap<Int, Binding> by lazy {
         strategy.db.openMap(
                 "a-node_db_rev_$rId",
                 Comparator { t1, t2 -> t1 - t2 },
