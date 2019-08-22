@@ -2,16 +2,13 @@ package org.klips.engine.util
 
 class ListSet<E>(private val listInit:() -> List<E>) : AbstractCollection<E>(), Set<E> {
     override val collection: List<E>
-        get() = list!!
+        get() = list
 
-    private val list : List<E>? = null
-        get() {
-            if (field == null)
-                field = listInit()
-            return field
-        }
+    private val list : List<E> by lazy {
+        listInit()
+    }
 
-    override fun iterator(): Iterator<E> = ListIterator(list!!)
+    override fun iterator(): Iterator<E> = ListIterator(list)
 }
 class ListIterator<E>(val list:List<E>) : AbstractIterator<E>() {
     var i = 0
