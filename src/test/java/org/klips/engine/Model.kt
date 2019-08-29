@@ -72,11 +72,11 @@ data class Level(val value: Float, val maxValue: Float) : Comparable<Level> {
 
     fun inc(dL: Float): Level {
         val newValue = value + dL
-        return if (newValue < 0f)
-            Level(0f, maxValue)
-        else if (newValue > maxValue)
-            Level(maxValue, maxValue)
-        else Level(newValue, maxValue)
+        return when {
+            newValue < 0f -> Level(0f, maxValue)
+            newValue > maxValue -> Level(maxValue, maxValue)
+            else -> Level(newValue, maxValue)
+        }
     }
 }
 
@@ -114,6 +114,10 @@ class Resource(val cid: Facet<CellId> = ref(),
                 amount: Int) :
     this(ConstFacet(CellId(cid)), ConstFacet(type), IntFacet(amount))
 }
+
+class CargoBay(val aid: Facet<ActorId> = ref(),
+               val type: Facet<ResourceType> = ref(),
+               val capacity: Facet<Level> = ref()): Fact()
 
 class Actor(val aid:    Facet<ActorId> = ref(),
             val pid:    Facet<PlayerId> = ref(),

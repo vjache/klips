@@ -1,11 +1,8 @@
 package org.klips.dsl
 
 import org.junit.Test
-import org.klips.ReferenceNotBoundException
-import org.klips.RuleGroupNotTriggeredException
 import org.klips.engine.*
 import org.klips.engine.util.Log
-import kotlin.test.assertFailsWith
 
 
 class OOMTest {
@@ -17,7 +14,7 @@ class OOMTest {
         val aid = ref<ActorId>("aid")
         val aid1 = ref<ActorId>("aid1")
         val kind = ref<ActorKind>("kind")
-        val kind1 = ref<ActorKind>("kind1")
+        val kind1 = ref<ActorKind>("land1")
         val pid = ref<PlayerId>("pid")
         val pid1 = ref<PlayerId>("pid1")
         val nrgy = ref<Level>("nrgy")

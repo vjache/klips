@@ -1,7 +1,6 @@
 package org.klips.dsl
 
 import org.junit.Test
-import org.klips.ReferenceNotBoundException
 import org.klips.RuleGroupNotTriggeredException
 import org.klips.engine.*
 import org.klips.engine.util.Log

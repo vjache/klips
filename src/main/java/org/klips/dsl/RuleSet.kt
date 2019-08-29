@@ -1,8 +1,10 @@
 package org.klips.dsl
 
 import org.klips.engine.rete.ReteInput
+import org.klips.engine.rete.builder.AgendaManager
 import org.klips.engine.rete.builder.ReteBuilderStrategy
 import org.klips.engine.rete.builder.RuleClause
+import org.klips.engine.rete.builder.PriorityAgendaManager
 import org.klips.engine.rete.mem.StrategyOneMem
 import org.klips.engine.util.Log
 
@@ -26,7 +28,7 @@ import org.klips.engine.util.Log
  * }
  * ```
  */
-abstract class RuleSet(val log: Log) : FacetBuilder() {
+abstract class RuleSet(val log: Log, private val agendaManager: AgendaManager = PriorityAgendaManager()) : FacetBuilder() {
 
     private val rules: MutableList<Rule> = mutableListOf()
 
@@ -34,13 +36,13 @@ abstract class RuleSet(val log: Log) : FacetBuilder() {
     get() {
         if (field == null)
         {
-            field = createEngine(log, rules.map(Rule::toInternal))
+            field = createEngine(log, rules.map(Rule::toInternal), agendaManager)
         }
         return field
     }
 
-    open protected fun createEngine(log: Log, rules: List<RuleClause>):ReteBuilderStrategy =
-            StrategyOneMem(log, rules)
+    protected open fun createEngine(log: Log, rules: List<RuleClause>, agendaManager: AgendaManager):ReteBuilderStrategy =
+            StrategyOneMem(log, rules, agendaManager)
 
     private var defaultPrioClock = 0.0
 
@@ -64,7 +66,7 @@ abstract class RuleSet(val log: Log) : FacetBuilder() {
      *
      * Rule can be prioritized, use 'priority' to pass priority. The priorities
      * are used to decide which activated rule apply first if there are more
-     * than one active rules in agenda
+     * than one active rules in agendaManager
      *
      * @see Rule
      * @see Rule.effect

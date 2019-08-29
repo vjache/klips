@@ -1,5 +1,6 @@
 package org.klips.engine.rule
 
+import org.klips.dsl.ActivationFilter
 import org.klips.dsl.Facet
 import org.klips.dsl.Fact
 import org.klips.dsl.substitute
@@ -17,6 +18,9 @@ open class RuleTestCommon {
             RuleClause(
                     setOf(*pattern),
                     object : Trigger {
+                        override fun checkGuard(cache: MutableMap<Any, Any>, solution: Modification<Binding>) = true
+
+                        override fun filter() = ActivationFilter.AssertOnly
                         override fun fire(cache: MutableMap<Any, Any>, solution: Modification<Binding>, addEffect: (Modification<Fact>) -> Unit) {
                             trigger(solution, addEffect)
                         }

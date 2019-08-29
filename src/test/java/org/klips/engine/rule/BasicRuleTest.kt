@@ -40,7 +40,7 @@ class BasicRuleTest : RuleTestCommon() {
         testTriggered(
                 Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")),
                 At(ref("aid"), ref("cid")),
-                Actor(ref("aid1"), ref("pid1"), ref("kind1"), ref("nrgy1"), ref("hlth1"), ref("state1")),
+                Actor(ref("aid1"), ref("pid1"), ref("land1"), ref("nrgy1"), ref("hlth1"), ref("state1")),
                 At(ref("aid1"), ref("cid1")),
                 Adjacent(ref("cid"), ref("cid1")))
         {

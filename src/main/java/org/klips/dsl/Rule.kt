@@ -22,9 +22,9 @@ import kotlin.properties.Delegates.notNull
  *
  * The rule condition is evaluated against working memory of
  * a rule alphaBindings to check whether it is activated. If rule become
- * active it is scheduled to trigger i.e. it is enqueued to the agenda.
+ * active it is scheduled to trigger i.e. it is enqueued to the agendaManager.
  *
- * The agenda is a priority queue, where priority is a double value and
+ * The agendaManager is a priority queue, where priority is a double value and
  * the lesser value the higher priority.
  *
  * This class is not intended to be used directly but using high
@@ -159,10 +159,17 @@ class Rule(val group: String, val priority: Double) : FacetBuilder(), Asserter b
             addAll(asserted)
         }
         return RuleClause(pattern, object : Trigger {
+            override fun checkGuard(cache: MutableMap<Any,Any>,
+                                    solution: Modification<Binding>) = guards.eval(cache, solution)
+
+            override fun filter(): ActivationFilter {
+                return rhs.filter?:let { AssertOnly }
+            }
+
             override fun fire(cache: MutableMap<Any,Any>,
                               solution: Modification<Binding>,
                               addEffect: (Modification<Fact>) -> Unit) {
-                if (guards.eval(cache, solution)) {
+                if (checkGuard(cache, solution)) {
                     rhs.init(solution)
 
                     // 1. Retire phase

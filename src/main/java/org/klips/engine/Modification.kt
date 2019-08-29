@@ -42,4 +42,7 @@ sealed class Modification<T> (val arg:T) {
     override fun hashCode(): Int {
         return this.javaClass.hashCode() + arg!!.hashCode()
     }
+
+    fun isAssert() = this is Assert<*>
+    fun isRetire() = this is Retire<*>
 }

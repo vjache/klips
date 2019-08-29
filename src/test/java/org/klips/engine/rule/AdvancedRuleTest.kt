@@ -1,8 +1,6 @@
 package org.klips.engine.rule
 
 import org.klips.engine.*
-import org.klips.engine.Modification.Assert
-import org.klips.engine.query.*
 import org.klips.engine.rete.builder.ReteBuilderStrategy
 import org.klips.engine.rete.mem.StrategyOneMem
 import org.junit.Test
@@ -62,7 +60,7 @@ class AdvancedRuleTest : RuleTestCommon() {
         val aid1 = ref<ActorId>("aid1")
         val pid1 = ref<PlayerId>("pid1")
         val cid1 = ref<CellId>("cid1")
-        val type1 = ref<ActorKind>("kind1")
+        val type1 = ref<ActorKind>("land1")
         val nrgy1  = ref<Level>("nrgy1")
         val hlth1  = ref<Level>("hlth1")
         val state1 = ref<State>("state1")

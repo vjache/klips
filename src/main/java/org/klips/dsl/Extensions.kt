@@ -3,11 +3,13 @@ package org.klips.dsl
 import org.klips.dsl.Facet.FacetRef
 import org.klips.engine.Binding
 import org.klips.engine.Modification
+import org.klips.engine.rete.builder.AgendaManager
+import org.klips.engine.rete.builder.PriorityAgendaManager
 import org.klips.engine.util.Log
 import java.util.concurrent.atomic.AtomicInteger
 
-fun rules(log: Log, init: RuleSet.() -> Unit): RuleSet {
-    val rs = object : RuleSet(log) {}
+fun rules(log: Log, agendaManager: AgendaManager = PriorityAgendaManager(), init: RuleSet.() -> Unit): RuleSet {
+    val rs = object : RuleSet(log,agendaManager) {}
     rs.init()
     return rs
 }

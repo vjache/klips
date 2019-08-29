@@ -8,6 +8,7 @@ import org.klips.engine.rete.mem.StrategyOneMem
 import org.klips.engine.rete.builder.Trigger
 import org.jgrapht.DirectedGraph
 import org.jgrapht.graph.SimpleDirectedGraph
+import org.klips.dsl.ActivationFilter
 import org.klips.engine.util.Log
 
 
@@ -33,12 +34,16 @@ class ReteTestGraphBuilder {
     val pattern4 = mutableSetOf<Fact>().apply {
         add(Actor(ref("aid"), ref("pid"), ref("kind"), ref("nrgy"), ref("hlth"), ref("state")))
         add(At(ref("aid"), ref("cid")))
-        add(Actor(ref("aid1"), ref("pid1"), ref("kind1"), ref("nrgy1"), ref("hlth1"), ref("state1")))
+        add(Actor(ref("aid1"), ref("pid1"), ref("land1"), ref("nrgy1"), ref("hlth1"), ref("state1")))
         add(At(ref("aid1"), ref("cid1")))
         add(Adjacent(ref("cid"), ref("cid1")))
     }
 
     val stdTrigger = object : Trigger {
+        override fun checkGuard(cache: MutableMap<Any, Any>, solution: Modification<Binding>) = true
+
+        override fun filter() = ActivationFilter.AssertOnly
+
         override fun fire(cache: MutableMap<Any, Any>,solution: Modification<Binding>, addEffect: (Modification<Fact>) -> Unit) {
             println(solution)
         }

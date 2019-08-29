@@ -3,6 +3,7 @@ package org.klips.db
 import org.junit.Test
 import org.klips.dsl.*
 import org.klips.engine.*
+import org.klips.engine.rete.builder.AgendaManager
 import org.klips.engine.rete.builder.ReteBuilderStrategy
 import org.klips.engine.rete.builder.RuleClause
 import org.klips.engine.rete.db.StrategyOneDB
@@ -18,7 +19,7 @@ class SimpleRuleSetTest : RuleSet(Log()) {
     val aid = ref<ActorId>("aid")
     val aid1 = ref<ActorId>("aid1")
     val kind = ref<ActorKind>("kind")
-    val kind1 = ref<ActorKind>("kind1")
+    val kind1 = ref<ActorKind>("land1")
     val pid = ref<PlayerId>("pid")
     val pid1 = ref<PlayerId>("pid1")
     val nrgy = ref<Level>("nrgy")
@@ -53,8 +54,8 @@ class SimpleRuleSetTest : RuleSet(Log()) {
         }
     }
 
-    override fun createEngine(log: Log, rules: List<RuleClause>): ReteBuilderStrategy {
-        return StrategyOneDB(DatabaseImpl(), TestDomainTupleFactory(), log, rules)
+    override fun createEngine(log: Log, rules: List<RuleClause>, agendaManager:AgendaManager): ReteBuilderStrategy {
+        return StrategyOneDB(DatabaseImpl(), TestDomainTupleFactory(), log, rules, agendaManager)
     }
 
     @Test

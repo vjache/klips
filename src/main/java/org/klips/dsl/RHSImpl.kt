@@ -8,7 +8,7 @@ import org.klips.engine.rete.ReteInput
 
 
 internal class RHSImpl(private val rule : Rule,
-              private val filter : ActivationFilter?,
+              val filter : ActivationFilter?,
               private val initBlock: RHSImpl.(Modification<Binding>) -> Unit) :
         RHS,
         RHSBase({validate(rule, it)}) {

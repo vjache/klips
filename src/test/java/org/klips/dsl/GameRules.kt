@@ -24,7 +24,7 @@ open class GameRules(log:Log = Log(workingMemory = true, agenda = true)) : RuleS
     val aid = ref<ActorId>("aid")
     val aid1 = ref<ActorId>("aid1")
     val kind = ref<ActorKind>("kind")
-    val kind1 = ref<ActorKind>("kind1")
+    val kind1 = ref<ActorKind>("land1")
     val pid = ref<PlayerId>("pid")
     val pid1 = ref<PlayerId>("pid1")
     val nrgy = ref<Level>("nrgy")

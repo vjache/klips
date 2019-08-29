@@ -4,7 +4,6 @@ import org.junit.Test
 import org.klips.RuleGroupNotTriggeredException
 import org.klips.engine.*
 import org.klips.engine.rete.ReteInput
-import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 
 class GameScenarioTest {
