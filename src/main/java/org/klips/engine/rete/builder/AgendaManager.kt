@@ -23,7 +23,7 @@ interface AgendaManager {
     fun add(solution: Modification<Binding>, ruleClause: RuleClause)
 
     /**
-     * Remove agenda
+     * Remove activation from agenda and return 'true' if it have been really removed.
      */
     fun remove(solution: Modification<Binding>, ruleClause: RuleClause): Boolean
 }
